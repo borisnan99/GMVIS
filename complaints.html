@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Complaints | GM Vis</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Complaints Form</h1>
+    <nav>
+      <a href="/index.html">Home</a>
+      <a href="/about.html">About</a>
+      <a href="/sports.html">Sports</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/complaints.html" aria-current="page">Complaints</a>
+    </nav>
+  </header>
+
+  <main>
+    <form id="complaints-form">
+      <label for="complaint-name">Name</label>
+      <input id="complaint-name" name="name" required />
+
+      <label for="complaint-email">Email</label>
+      <input id="complaint-email" name="email" type="email" required />
+
+      <label for="complaint-details">Complaint details</label>
+      <textarea id="complaint-details" name="details" rows="6" required></textarea>
+
+      <button type="submit">Submit complaint</button>
+    </form>
+    <p id="complaints-status" role="status"></p>
+  </main>
+
+  <footer>
+    <small>&copy; GM Vis Community Group</small>
+  </footer>
+
+  <script src="/script.js"></script>
+</body>
+</html>

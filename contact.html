@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact | GM Vis</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>General Enquiry</h1>
+    <nav>
+      <a href="/index.html">Home</a>
+      <a href="/about.html">About</a>
+      <a href="/sports.html">Sports</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/contact.html" aria-current="page">Contact</a>
+      <a href="/complaints.html">Complaints</a>
+    </nav>
+  </header>
+
+  <main>
+    <form id="contact-form">
+      <label for="contact-name">Name</label>
+      <input id="contact-name" name="name" required />
+
+      <label for="contact-email">Email</label>
+      <input id="contact-email" name="email" type="email" required />
+
+      <label for="contact-message">Message</label>
+      <textarea id="contact-message" name="message" rows="6" required></textarea>
+
+      <button type="submit">Send enquiry</button>
+    </form>
+    <p id="contact-status" role="status"></p>
+  </main>
+
+  <footer>
+    <small>&copy; GM Vis Community Group</small>
+  </footer>
+
+  <script src="/script.js"></script>
+</body>
+</html>
