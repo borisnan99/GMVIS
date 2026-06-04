@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog | GM Vis</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Community Blog</h1>
+    <nav>
+      <a href="/index.html">Home</a>
+      <a href="/about.html">About</a>
+      <a href="/sports.html">Sports</a>
+      <a href="/blog.html" aria-current="page">Blog</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/complaints.html">Complaints</a>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2>Posts</h2>
+      <div id="blog-posts"></div>
+    </section>
+
+    <section>
+      <h2>Add or update post</h2>
+      <p>Use this form to add a new post or update an existing one.</p>
+      <form id="blog-form">
+        <input type="hidden" id="post-id" />
+
+        <label for="post-title">Title</label>
+        <input id="post-title" name="title" required />
+
+        <label for="post-author">Author</label>
+        <input id="post-author" name="author" required />
+
+        <label for="post-content">Content</label>
+        <textarea id="post-content" name="content" rows="6" required></textarea>
+
+        <button type="submit">Save post</button>
+        <button id="cancel-edit" type="button">Cancel edit</button>
+      </form>
+      <p id="blog-message" role="status"></p>
+    </section>
+  </main>
+
+  <footer>
+    <small>&copy; GM Vis Community Group</small>
+  </footer>
+
+  <script src="/script.js"></script>
+</body>
+</html>
