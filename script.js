@@ -1,4 +1,22 @@
 const BLOG_STORAGE_KEY = "gmvis_blog_posts";
+const DEFAULT_POST = {
+  id: String(Date.now()),
+  title: "Welcome to GM Vis",
+  author: "Admin",
+  content: "We are excited to launch our community blog and share updates.",
+  updatedAt: new Date().toISOString(),
+};
+
+const canUseStorage = (() => {
+  try {
+    const key = "__gmvis_storage_test";
+    localStorage.setItem(key, "1");
+    localStorage.removeItem(key);
+    return true;
+  } catch {
+    return false;
+  }
+})();
 
 const escapeHtml = (value) =>
   value
@@ -9,18 +27,14 @@ const escapeHtml = (value) =>
     .replaceAll("'", "&#39;");
 
 const readPosts = () => {
+  if (!canUseStorage) {
+    return [DEFAULT_POST];
+  }
+
   try {
     const raw = localStorage.getItem(BLOG_STORAGE_KEY);
     if (!raw) {
-      return [
-        {
-          id: String(Date.now()),
-          title: "Welcome to GM Vis",
-          author: "Admin",
-          content: "We are excited to launch our community blog and share updates.",
-          updatedAt: new Date().toISOString(),
-        },
-      ];
+      return [DEFAULT_POST];
     }
 
     const parsed = JSON.parse(raw);
@@ -31,7 +45,16 @@ const readPosts = () => {
 };
 
 const savePosts = (posts) => {
-  localStorage.setItem(BLOG_STORAGE_KEY, JSON.stringify(posts));
+  if (!canUseStorage) {
+    return false;
+  }
+
+  try {
+    localStorage.setItem(BLOG_STORAGE_KEY, JSON.stringify(posts));
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 const renderPosts = (posts) => {
@@ -65,14 +88,20 @@ const setupBlog = () => {
   const form = document.getElementById("blog-form");
   const message = document.getElementById("blog-message");
   const cancelEdit = document.getElementById("cancel-edit");
+  const storageWarning = document.getElementById("blog-storage-warning");
 
   if (!form || !message || !cancelEdit) {
     return;
   }
+  message.setAttribute("aria-live", "polite");
 
   let posts = readPosts();
   savePosts(posts);
   renderPosts(posts);
+  if (storageWarning && !canUseStorage) {
+    storageWarning.textContent =
+      "Your browser is blocking local storage. Blog changes only last while this page stays open.";
+  }
 
   const idInput = document.getElementById("post-id");
   const titleInput = document.getElementById("post-title");
@@ -140,7 +169,7 @@ const setupBlog = () => {
     titleInput.value = post.title;
     authorInput.value = post.author;
     contentInput.value = post.content;
-    message.textContent = "Editing selected post.";
+    message.textContent = `Editing post: ${post.title}`;
     titleInput.focus();
   });
 };
@@ -152,17 +181,15 @@ const setupForm = (formId, statusId, successMessage) => {
   if (!form || !status) {
     return;
   }
+  status.setAttribute("aria-live", "polite");
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    const formData = new FormData(form);
-    const payload = Object.fromEntries(formData.entries());
-    localStorage.setItem(`${formId}_last_submission`, JSON.stringify(payload));
     status.textContent = successMessage;
     form.reset();
   });
 };
 
 setupBlog();
-setupForm("contact-form", "contact-status", "Thanks. Your enquiry has been recorded.");
-setupForm("complaints-form", "complaints-status", "Thanks. Your complaint has been recorded for review.");
+setupForm("contact-form", "contact-status", "Thanks. Your enquiry has been submitted (demo mode: no backend).");
+setupForm("complaints-form", "complaints-status", "Thanks. Your complaint has been submitted (demo mode: no backend).");
