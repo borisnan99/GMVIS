@@ -1,0 +1,34 @@
+# Dependencies & tooling — not needed in the runtime image
+node_modules
+package.json
+package-lock.json
+
+# Tests & reports
+tests
+playwright.config.js
+playwright-report
+test-results
+
+# Legacy/unused root files (site uses assets/styles.css and assets/app.js)
+script.js
+styles.css
+
+# Kubernetes / Docker meta
+k8s
+Dockerfile
+.dockerignore
+
+# VCS, docs, project memory
+.git
+.gitignore
+.remember
+.claude
+README.md
+LICENSE
+
+# Editor/OS cruft
+.vscode
+.idea
+*.log
+.DS_Store
+Thumbs.db
