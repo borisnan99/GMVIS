@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gmvis-web
+  labels:
+    app.kubernetes.io/name: gmvis-web
+    app.kubernetes.io/part-of: gmvis
+  annotations:
+    # If you use cert-manager for TLS, uncomment and set your issuer:
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  # Set to your cluster's ingress controller class (e.g. "nginx", "traefik")
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - gmvis.example.com   # <-- replace with your domain
+      secretName: gmvis-web-tls
+  rules:
+    - host: gmvis.example.com  # <-- replace with your domain
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: gmvis-web
+                port:
+                  name: http

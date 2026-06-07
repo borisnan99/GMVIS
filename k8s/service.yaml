@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gmvis-web
+  labels:
+    app.kubernetes.io/name: gmvis-web
+    app.kubernetes.io/part-of: gmvis
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: gmvis-web
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP

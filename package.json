@@ -1,0 +1,28 @@
+{
+  "name": "gmvis",
+  "version": "1.0.0",
+  "description": "Greater Manchester Vis — community website for blind and partially sighted people across Greater Manchester.",
+  "main": "script.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/borisnan99/GMVIS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/borisnan99/GMVIS/issues"
+  },
+  "homepage": "https://github.com/borisnan99/GMVIS#readme",
+  "devDependencies": {
+    "@axe-core/playwright": "^4.11.3",
+    "@playwright/test": "^1.60.0",
+    "serve": "^14.2.6"
+  }
+}

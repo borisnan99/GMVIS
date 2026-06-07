@@ -26,3 +26,14 @@ yarn-error.log*
 
 # Environment files (local configs)
 /.env.*
+
+# Node dependencies
+/node_modules/
+
+# Playwright test artifacts
+/playwright-report/
+/test-results/
+
+# Claude Code / project memory
+/.remember/
+/.claude/
