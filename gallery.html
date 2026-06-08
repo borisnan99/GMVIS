@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Blog — Greater Manchester Vis</title>
-<meta name="description" content="Stories from our members, guides and volunteers — updated regularly. Real experiences of inclusive sport and community in Greater Manchester.">
+<title>Gallery — Greater Manchester Vis</title>
+<meta name="description" content="Photos and videos from Greater Manchester Vis sessions, fixtures and socials — inclusive sport and community in action.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@400;500;700&display=swap" rel="stylesheet">
@@ -27,8 +27,8 @@
         <a href="about.html">About</a>
         <a href="activities.html">Activities</a>
         <a href="news.html">News</a>
-        <a href="blog.html" aria-current="page">Blog</a>
-        <a href="gallery.html">Gallery</a>
+        <a href="blog.html">Blog</a>
+        <a href="gallery.html" aria-current="page">Gallery</a>
         <a href="get-involved.html">Get Involved</a>
         <a href="contact.html">Contact</a>
       </div>
@@ -39,30 +39,21 @@
 <main id="main">
 <section class="band" style="padding-block:clamp(54px,7vw,92px)">
   <div class="wrap">
-    <p class="eyebrow" style="color:var(--gold-300)">Stories</p>
-    <h1 class="display" style="font-size:clamp(2.4rem,5.4vw,4.2rem); color:#fff; max-width:18ch">The GM Vis blog</h1>
-    <p class="lede" style="color:#E2D2F7; margin-top:18px; max-width:62ch">Real stories from our members, guides and volunteers — the wins, the wobbles and the friendships. Updated regularly, written by the people who live it.</p>
-    <button class="readaloud" data-readaloud="#blog-read" data-label-default="Listen" aria-label="Listen to this page introduction" style="background:rgba(255,255,255,.08); border-color:rgba(247,220,151,.4); color:var(--gold-300); margin-top:26px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4l14 8-14 8V4z"/></svg><span class="ra-label">Listen</span></button>
-    <p id="blog-read" class="visually-hidden" data-read-text="Welcome to the Greater Manchester Vis blog. This is where our members, guides and volunteers share their own stories in their own words. Use the filter buttons to choose a category, and select read the full story on any post to read it in full. We update the blog regularly, so do check back."></p>
+    <p class="eyebrow" style="color:var(--gold-300)">In pictures</p>
+    <h1 class="display" style="font-size:clamp(2.4rem,5.4vw,4.2rem); color:#fff; max-width:18ch">Gallery</h1>
+    <p class="lede" style="color:#E2D2F7; margin-top:18px; max-width:62ch">Moments from our sessions, fixtures and socials — photos and videos of inclusive sport and community in action across Greater Manchester.</p>
+    <button class="readaloud" data-readaloud="#gallery-read" data-label-default="Listen" aria-label="Listen to this page introduction" style="background:rgba(255,255,255,.08); border-color:rgba(247,220,151,.4); color:var(--gold-300); margin-top:26px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4l14 8-14 8V4z"/></svg><span class="ra-label">Listen</span></button>
+    <p id="gallery-read" class="visually-hidden" data-read-text="Welcome to the Greater Manchester Vis gallery. Here you will find photographs and videos from our sessions, fixtures and social events. Use the filter buttons to show all media, only photos, or only videos. Each item has a caption describing what it shows."></p>
   </div>
 </section>
-<section class="section" style="background:var(--paper-2)">
+<section class="section">
   <div class="wrap">
-    <div class="pills" role="group" aria-label="Filter posts by category" style="margin-bottom:32px">
-      <button type="button" class="pill" aria-pressed="true" style="background:var(--purple-600); color:#fff; border:none; cursor:pointer; font-family:inherit; font-size:inherit">All posts</button>
-      <button type="button" class="pill" aria-pressed="false" style="border:none; cursor:pointer; font-family:inherit; font-size:inherit">Member voices</button>
-      <button type="button" class="pill" aria-pressed="false" style="border:none; cursor:pointer; font-family:inherit; font-size:inherit">Living the game</button>
-      <button type="button" class="pill" aria-pressed="false" style="border:none; cursor:pointer; font-family:inherit; font-size:inherit">Guides</button>
-      <button type="button" class="pill" aria-pressed="false" style="border:none; cursor:pointer; font-family:inherit; font-size:inherit">Tips</button>
+    <div class="pills" role="group" aria-label="Filter gallery" style="margin-bottom:32px">
+      <button type="button" class="pill" aria-pressed="true" style="background:var(--purple-600); color:#fff; border:none; cursor:pointer; font-family:inherit; font-size:inherit">All</button>
+      <button type="button" class="pill" aria-pressed="false" style="border:none; cursor:pointer; font-family:inherit; font-size:inherit">Photos</button>
+      <button type="button" class="pill" aria-pressed="false" style="border:none; cursor:pointer; font-family:inherit; font-size:inherit">Videos</button>
     </div>
-    <div id="blog-posts" class="cards" aria-live="polite"></div>
-  </div>
-</section>
-<section class="section band">
-  <div class="wrap center stack" style="max-width:660px">
-    <h2 class="h2">Got a story to tell?</h2>
-    <p class="lede center">Every member has a story worth sharing. If you would like to write for the blog — or have us write it with you — we would love to hear from you.</p>
-    <div style="margin-top:8px"><a class="btn gold lg" href="contact.html">Share your story</a></div>
+    <div id="gallery-grid" class="gallery" aria-live="polite"></div>
   </div>
 </section>
 </main>

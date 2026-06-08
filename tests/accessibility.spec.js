@@ -7,6 +7,7 @@ const PAGES = [
   { name: "Activities",  path: "/activities.html" },
   { name: "News",        path: "/news.html" },
   { name: "Blog",        path: "/blog.html" },
+  { name: "Gallery",     path: "/gallery.html" },
   { name: "Get Involved",path: "/get-involved.html" },
   { name: "Contact",     path: "/contact.html" },
   { name: "Complaints",  path: "/complaints.html" },

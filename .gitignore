@@ -29,6 +29,12 @@ yarn-error.log*
 
 # Node dependencies
 /node_modules/
+/server/node_modules/
+
+# Server runtime data (SQLite DB + uploads) and test data
+/server/data/
+/server/.testdata/
+/.pwtest-data/
 
 # Playwright test artifacts
 /playwright-report/
