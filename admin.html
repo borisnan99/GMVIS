@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en-GB" data-contrast="normal" data-dys="off" data-motion="auto">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin portal — Greater Manchester Vis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="assets/admin.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+<header class="site-header">
+  <div class="wrap">
+    <nav class="nav" aria-label="Admin">
+      <a class="brand" href="index.html" aria-label="Greater Manchester Vis — home">
+        <img class="mark" src="assets/falcon-bird.svg" alt="" aria-hidden="true">
+        <span class="name" aria-hidden="true"><b>Greater Manchester Vis</b><span>Admin portal</span></span>
+      </a>
+      <a class="menu-link" href="index.html" style="margin-left:auto; font-family:var(--font-head); font-weight:700; text-decoration:none; color:var(--ink)">View site</a>
+      <button id="logout-btn" class="btn ghost" type="button" hidden>Sign out</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap" style="padding-block:clamp(28px,5vw,56px)">
+
+  <!-- Live region for status messages -->
+  <div id="status" class="admin-status" role="status" aria-live="polite"></div>
+
+  <!-- ============ LOGIN ============ -->
+  <section id="login-view" aria-labelledby="login-h" hidden>
+    <div class="card admin-login-card">
+      <h1 id="login-h" class="h2" style="font-size:1.8rem; margin-bottom:6px">Admin sign in</h1>
+      <p style="color:var(--ink-soft); margin-bottom:22px">Enter the admin password to manage blog posts and media.</p>
+      <form id="login-form" novalidate>
+        <div class="field">
+          <label for="admin-pw">Password</label>
+          <input class="input" type="password" id="admin-pw" name="password" autocomplete="current-password" aria-required="true" aria-describedby="login-error">
+          <span class="err" id="login-error" role="alert"></span>
+        </div>
+        <button class="btn gold" type="submit" id="login-submit">Sign in</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ DASHBOARD ============ -->
+  <section id="dash-view" aria-labelledby="dash-h" hidden>
+    <h1 id="dash-h" class="h2" style="font-size:clamp(1.8rem,3vw,2.4rem); margin-bottom:20px">Admin portal</h1>
+
+    <div class="admin-tabs" role="tablist" aria-label="Admin sections">
+      <button class="admin-tab" role="tab" id="tab-posts" aria-controls="panel-posts" aria-selected="true">Blog posts</button>
+      <button class="admin-tab" role="tab" id="tab-media" aria-controls="panel-media" aria-selected="false" tabindex="-1">Media gallery</button>
+    </div>
+
+    <!-- ---- POSTS PANEL ---- -->
+    <div id="panel-posts" class="admin-panel" role="tabpanel" aria-labelledby="tab-posts" tabindex="0">
+      <div class="admin-panel-head">
+        <h2 class="h3">Blog posts</h2>
+        <button class="btn" type="button" id="new-post-btn">+ New post</button>
+      </div>
+
+      <!-- Post editor (hidden until adding/editing) -->
+      <form id="post-form" class="card admin-editor" hidden novalidate aria-label="Post editor">
+        <h3 class="h3" id="post-form-title" style="margin-bottom:18px">New post</h3>
+        <input type="hidden" id="post-id">
+        <div class="field">
+          <label for="post-title">Title <span class="req" aria-hidden="true">*</span></label>
+          <input class="input" id="post-title" name="title" aria-required="true" aria-describedby="post-title-err">
+          <span class="err" id="post-title-err" role="alert">Please enter a title.</span>
+        </div>
+        <div class="admin-grid-2">
+          <div class="field">
+            <label for="post-category">Category</label>
+            <select class="select" id="post-category">
+              <option>Member voices</option>
+              <option>Living the game</option>
+              <option>Guides</option>
+              <option>Tips</option>
+              <option>Club</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="post-author">Author</label>
+            <input class="input" id="post-author" placeholder="e.g. Aisha P.">
+          </div>
+        </div>
+        <div class="field">
+          <label for="post-excerpt">Excerpt</label>
+          <p class="hint" id="post-excerpt-hint">A short summary shown on the blog listing.</p>
+          <textarea class="textarea" id="post-excerpt" style="min-height:80px" aria-describedby="post-excerpt-hint"></textarea>
+        </div>
+        <div class="field">
+          <label for="post-body">Body</label>
+          <p class="hint" id="post-body-hint">The full post. Separate paragraphs with a blank line.</p>
+          <textarea class="textarea" id="post-body" style="min-height:220px" aria-describedby="post-body-hint"></textarea>
+        </div>
+        <div class="admin-grid-2">
+          <div class="field">
+            <label for="post-cover">Cover image</label>
+            <select class="select" id="post-cover">
+              <option value="">— None —</option>
+            </select>
+          </div>
+          <div class="field consent-field" style="align-self:end; margin-bottom:24px">
+            <input type="checkbox" id="post-published" checked>
+            <label for="post-published">Published (visible on the public site)</label>
+          </div>
+        </div>
+        <div class="admin-actions">
+          <button class="btn gold" type="submit" id="post-save">Save post</button>
+          <button class="btn ghost" type="button" id="post-cancel">Cancel</button>
+        </div>
+      </form>
+
+      <div id="posts-list" class="admin-list" aria-live="polite"></div>
+    </div>
+
+    <!-- ---- MEDIA PANEL ---- -->
+    <div id="panel-media" class="admin-panel" role="tabpanel" aria-labelledby="tab-media" tabindex="0" hidden>
+      <div class="admin-panel-head">
+        <h2 class="h3">Media gallery</h2>
+      </div>
+
+      <form id="upload-form" class="card admin-editor" novalidate aria-label="Upload media">
+        <h3 class="h3" style="margin-bottom:18px">Upload an image or video</h3>
+        <div class="field">
+          <label for="upload-file">File <span class="req" aria-hidden="true">*</span></label>
+          <p class="hint" id="upload-file-hint">Images (jpg, png, webp, gif, avif, svg) or video (mp4, webm, ogg, mov). Max 200&nbsp;MB.</p>
+          <input class="input" type="file" id="upload-file" accept="image/*,video/*" aria-required="true" aria-describedby="upload-file-hint upload-file-err">
+          <span class="err" id="upload-file-err" role="alert">Please choose a file.</span>
+        </div>
+        <div class="admin-grid-2">
+          <div class="field">
+            <label for="upload-title">Title</label>
+            <input class="input" id="upload-title" placeholder="e.g. Goalball finals">
+          </div>
+          <div class="field">
+            <label for="upload-caption">Caption / alt text</label>
+            <input class="input" id="upload-caption" placeholder="Described for screen readers">
+          </div>
+        </div>
+        <div class="admin-actions">
+          <button class="btn gold" type="submit" id="upload-submit">Upload</button>
+        </div>
+      </form>
+
+      <div id="assets-grid" class="admin-media-grid" aria-live="polite"></div>
+    </div>
+  </section>
+</main>
+
+<script src="assets/app.js"></script>
+<script src="assets/admin.js"></script>
+</body>
+</html>
