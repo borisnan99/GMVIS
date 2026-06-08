@@ -10,8 +10,8 @@ USER root
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 # Static site content
-COPY index.html about.html activities.html news.html blog.html \
-     get-involved.html contact.html complaints.html 404.html \
+COPY index.html about.html activities.html news.html blog.html gallery.html \
+     get-involved.html contact.html complaints.html 404.html admin.html \
      /usr/share/nginx/html/
 COPY assets/  /usr/share/nginx/html/assets/
 COPY uploads/ /usr/share/nginx/html/uploads/

@@ -3,16 +3,27 @@ kind: Kustomization
 
 # Deploy everything with:  kubectl apply -k k8s/
 resources:
+  # Static site (nginx)
   - deployment.yaml
   - service.yaml
+  # Admin API (Node) + storage + secret
+  - api-secret.yaml
+  - api-pvc.yaml
+  - api-deployment.yaml
+  - api-service.yaml
+  # Shared ingress (routes /api and /media to the API, the rest to nginx)
   - ingress.yaml
 
 commonLabels:
   app.kubernetes.io/part-of: gmvis
 
-# Override the image tag here instead of editing deployment.yaml, e.g.:
+# Override image tags here instead of editing the deployments, e.g.:
 #   kustomize edit set image gmvis=ghcr.io/borisnan99/gmvis:1.0.0
+#   kustomize edit set image gmvis-api=ghcr.io/borisnan99/gmvis-api:1.0.0
 images:
   - name: gmvis
     newName: gmvis
+    newTag: latest
+  - name: gmvis-api
+    newName: gmvis-api
     newTag: latest

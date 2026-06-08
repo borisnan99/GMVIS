@@ -1,7 +1,13 @@
-# Dependencies & tooling — not needed in the runtime image
-node_modules
-package.json
-package-lock.json
+# Dependencies (installed fresh inside each image)
+/node_modules
+/server/node_modules
+/package.json
+/package-lock.json
+
+# Server runtime data (SQLite DB + uploads) and test data
+/server/data
+/server/.testdata
+/.pwtest-data
 
 # Tests & reports
 tests
@@ -10,12 +16,12 @@ playwright-report
 test-results
 
 # Legacy/unused root files (site uses assets/styles.css and assets/app.js)
-script.js
-styles.css
+/script.js
+/styles.css
 
 # Kubernetes / Docker meta
 k8s
-Dockerfile
+/Dockerfile
 .dockerignore
 
 # VCS, docs, project memory
