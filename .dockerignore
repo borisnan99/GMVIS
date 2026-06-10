@@ -19,9 +19,7 @@ test-results
 /script.js
 /styles.css
 
-# Kubernetes / Docker meta
-k8s
-/Dockerfile
+# Docker meta
 .dockerignore
 
 # VCS, docs, project memory
