@@ -31,8 +31,18 @@ ingress:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     cloudflare.com/dns-enabled: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    # Admin video uploads go up to 200 MB (multer limit in server/src/index.js).
-    nginx.ingress.kubernetes.io/proxy-body-size: "200m"
+    # Multer caps uploads at exactly 200 MiB (server/src/index.js). 210m gives
+    # the multipart envelope headroom so the app's friendly JSON 400 is always
+    # what enforces the limit, never nginx's HTML 413.
+    nginx.ingress.kubernetes.io/proxy-body-size: "210m"
+    # Large video range-requests can stream for a long time; don't let the
+    # 60s proxy defaults kill them, and don't spool responses to the
+    # controller's disk. Request buffering stays ON (default) on purpose:
+    # nginx absorbs slow admin uploads and forwards them fast, which keeps
+    # Node's default 300s requestTimeout from aborting slow connections.
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
 
 # Non-secret env for the web container. ADMIN_PASSWORD and SESSION_SECRET
 # come from the `gmvis-app` SealedSecret.
