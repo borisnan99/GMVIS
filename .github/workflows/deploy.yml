@@ -14,10 +14,6 @@ on:
         type: boolean
         default: true
 
-permissions:
-  contents: read
-  packages: write
-
 env:
   IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/gmvis-web
 
@@ -25,8 +21,12 @@ jobs:
   build-push:
     name: Build and push image
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     outputs:
       image_tag: ${{ steps.meta.outputs.image_tag }}
+      git_sha: ${{ steps.meta.outputs.git_sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,19 +42,26 @@ jobs:
 
       - name: Compute tags
         id: meta
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          SHORT_SHA=$(git rev-parse --short=12 HEAD)
-          IMAGE_TAG="sha-${SHORT_SHA}"
+          GIT_SHA=$(git rev-parse HEAD)
+          IMAGE_TAG="sha-$(git rev-parse --short=12 HEAD)"
           TAGS="${IMAGE_NAME}:${IMAGE_TAG}"
           case "${{ github.event_name }}" in
             release)
-              TAGS="${TAGS},${IMAGE_NAME}:${{ github.event.release.tag_name }},${IMAGE_NAME}:latest"
+              # Tag names are untrusted input (and may contain characters that
+              # are invalid in a Docker tag, like "/" or "+"): never interpolate
+              # them into the script, and map anything unsafe to "-".
+              SAFE_TAG=$(printf '%s' "$RELEASE_TAG" | tr -c 'a-zA-Z0-9_.-' '-')
+              TAGS="${TAGS},${IMAGE_NAME}:${SAFE_TAG},${IMAGE_NAME}:latest"
               ;;
             workflow_dispatch)
               TAGS="${TAGS},${IMAGE_NAME}:manual-${{ github.run_number }}"
               ;;
           esac
           {
+            echo "git_sha=${GIT_SHA}"
             echo "image_tag=${IMAGE_TAG}"
             echo "tags<<TAGS_EOF"
             echo "${TAGS}"
@@ -79,18 +86,19 @@ jobs:
       github.event_name == 'release' ||
       (github.event_name == 'workflow_dispatch' && inputs.deploy == true)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       APP: gmvis-prod
       NAMESPACE: prod-gmvis
       CHART_PATH: deploy/helm/gmvis
       IMAGE_TAG: ${{ needs.build-push.outputs.image_tag }}
-      REF: ${{ inputs.ref || github.ref_name }}
+      # Pin ArgoCD to the exact commit the image was built from. Using a
+      # branch name here would leave the app auto-syncing that branch
+      # afterwards (spec says: push to main does NOT deploy) and could skew
+      # from the built image if the branch moves between build and deploy.
+      REVISION: ${{ needs.build-push.outputs.git_sha }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.REF }}
-
       # Pin the argocd CLI so a downstream release on the argoproj/argo-cd
       # `latest` channel cannot quietly change deploy semantics (flag
       # rename, default flip) overnight. v3.4.2 is the version validated
@@ -122,10 +130,10 @@ jobs:
             until "$@"; do
               i=$((i+1))
               if [ $i -ge 5 ]; then
-                echo "::error::FAILED after 5 attempts: $*" >&2
+                echo "::error::FAILED after 5 attempts: $*"
                 return 1
               fi
-              echo "::warning::attempt $i failed, retrying in 15s..." >&2
+              echo "::warning::attempt $i failed, retrying in 15s..."
               sleep 15
             done
           }
@@ -137,9 +145,9 @@ jobs:
 
           retry argocd app create "$APP" \
             --upsert \
-            --repo "https://github.com/borisnan99/GMVIS.git" \
+            --repo "${{ github.server_url }}/${{ github.repository }}.git" \
             --path "$CHART_PATH" \
-            --revision "$REF" \
+            --revision "$REVISION" \
             --dest-server "https://kubernetes.default.svc" \
             --dest-namespace "$NAMESPACE" \
             --sync-option CreateNamespace=true \
@@ -167,4 +175,7 @@ jobs:
           # server-side, closing the race where `app wait` could otherwise read
           # the prior Synced/Healthy state and return before the new tag rolls.
           retry argocd app get "$APP" --refresh --grpc-web >/dev/null
-          retry argocd app wait "$APP" --sync --health --operation --timeout 600 --grpc-web
+          # A wait timeout is a deployment verdict, not a network blip — never
+          # retry it (a failed automated sync won't retry itself for the same
+          # spec either; re-waiting would just quintuple the time-to-failure).
+          argocd app wait "$APP" --sync --health --operation --timeout 600 --grpc-web
