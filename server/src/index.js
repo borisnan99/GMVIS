@@ -99,6 +99,10 @@ function str(v, max) {
 /* ---------- App ---------- */
 const app = express();
 app.disable("x-powered-by");
+// Behind ingress-nginx, req.ip must come from X-Forwarded-For or the login
+// throttle keys every visitor to the controller pod's IP (one shared bucket).
+// Direct connections (local dev/tests) are unaffected: no XFF header, same IP.
+app.set("trust proxy", 1);
 app.use(express.json({ limit: "1mb" }));
 
 /* ---- Auth ---- */
