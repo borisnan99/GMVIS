@@ -36,12 +36,20 @@ kubeseal \
   --namespace "$NAMESPACE" \
   --scope strict \
 | awk '
+    /^---$/ { injected = 0 }
     !injected && /^metadata:$/ {
       print
       print "  annotations:"
       print "    argocd.argoproj.io/sync-wave: \"-20\""
       injected = 1
+      ever_injected = 1
       next
     }
     { print }
+    END {
+      if (!ever_injected) {
+        print "error: no top-level metadata: found; sync-wave not injected" > "/dev/stderr"
+        exit 1
+      }
+    }
   '
