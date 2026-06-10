@@ -40,10 +40,12 @@ HTTPS endpoint, and the Cloudflare integration that honours the
 >   anonuid/anongid or directory mode rather than the chart.
 > - SQLite runs in WAL mode on an NFS-backed volume. Single replica +
 >   `Recreate` strategy removes multi-writer risk, but an unclean kill can
->   still corrupt the DB — keep §8's persistence check and take periodic
->   backups (e.g. `kubectl exec ... -- sqlite3 /data/gmvis.db ".backup
->   /data/backup-$(date +%F).db"` then copy off-cluster, or adopt litestream
->   later).
+>   still corrupt the DB — keep §6's persistence check and take periodic
+>   backups. The image has no `sqlite3` CLI (the app uses Node's built-in
+>   `node:sqlite`), so back up with:
+>   `kubectl -n prod-gmvis exec deploy/gmvis-web -- node -e
+>   "new (require('node:sqlite').DatabaseSync)('/data/gmvis.db').exec(\"VACUUM INTO '/data/backup.db'\")"`,
+>   then `kubectl cp` the file off-cluster (or adopt litestream later).
 
 ## 1. ArgoCD CI account + GitHub repo secrets
 
