@@ -18,15 +18,14 @@ The **primary audience is blind / low-vision users and screen-reader users**, so
 
 The project has two parts:
 
-1. **A static, accessible multi-page website** (HTML/CSS/JS, no build step) served
-   by **nginx**.
-2. **A small backend (Node/Express)** powering a **login-protected admin portal**
-   for managing **blog posts** and a **media gallery** (images *and* uploaded
-   videos), plus the public pages that display that content.
+1. **A static, accessible multi-page website** (HTML/CSS/JS, no build step).
+2. **A small backend (Node/Express)** that serves the static site and powers a
+   **login-protected admin portal** for managing **blog posts** and a **media
+   gallery** (images *and* uploaded videos), plus the public pages that display
+   that content.
 
 - **Repository:** `github.com/borisnan99/GMVIS` (default branch `main`).
-- **Deployment target:** Kubernetes (Docker images for both the static site and
-  the API).
+- **Deployment target:** Kubernetes via ArgoCD (single image `ghcr.io/borisnan99/gmvis-web` from `server/Dockerfile`).
 - **Status:** feature-complete; 119 Playwright tests passing; merged to `main`.
 
 ---
@@ -43,9 +42,8 @@ The project has two parts:
 | Auth | Shared password → HMAC-signed httpOnly cookie | `node:crypto`, no JWT lib |
 | Forms (contact/complaints/newsletter) | **Web3Forms** | Access key is public/client-side (safe to embed) |
 | Tests | **Playwright + `@axe-core/playwright`** | 119 tests |
-| Static image | `nginxinc/nginx-unprivileged:1.27-alpine` | non-root, read-only-root |
 | API image | `node:24-slim` | non-root (uid 1000), read-only-root |
-| Orchestration | Kubernetes + Kustomize | `k8s/` |
+| Orchestration | Kubernetes + Helm + ArgoCD | `deploy/helm/gmvis/`, release-driven CI |
 
 ---
 
@@ -95,18 +93,10 @@ The project has two parts:
 │   ├── public-content.spec.js Dynamic blog + gallery rendering and filters
 │   └── global-setup.js        Wipes the test data dir before each run
 │
-├── k8s/                       Kubernetes manifests (apply with: kubectl apply -k k8s/)
-│   ├── deployment.yaml        nginx static site (2 replicas)
-│   ├── service.yaml           nginx ClusterIP
-│   ├── api-deployment.yaml    Node API (1 replica, Recreate)
-│   ├── api-service.yaml       API ClusterIP
-│   ├── api-pvc.yaml           ReadWriteOnce volume for DB + uploads
-│   ├── api-secret.yaml        ADMIN_PASSWORD + SESSION_SECRET (PLACEHOLDERS — change!)
-│   ├── ingress.yaml           /api + /media → API; everything else → nginx
-│   └── kustomization.yaml     ties it together; sets image tags
-│
-├── nginx/default.conf         nginx server block (gzip, caching, security headers, 404)
-├── Dockerfile                 STATIC SITE image (nginx)
+├── deploy/                    Helm chart + kubeseal wrapper (ArgoCD deploys this)
+│   ├── helm/gmvis/            chart: web Deployment/Service/Ingress/PVC + SealedSecrets
+│   └── seal-secrets.sh
+├── .github/workflows/deploy.yml  Release → build ghcr.io image → ArgoCD sync
 ├── .dockerignore  .gitignore
 ├── playwright.config.js       runs the Node server as the test web server (port 3000)
 ├── package.json               root — Playwright tooling only
@@ -144,10 +134,8 @@ Every page includes:
 
 ### Architecture
 ```
-Browser ─┬─► nginx ............ static site (HTML/CSS/JS)        [k8s: 2 replicas]
-         ├─► Node/Express ..... /api/*  (blogs, media, auth)     [k8s: 1 replica]
-         └─► Node/Express ..... /media/* (uploaded files, HTTP range support)
-                               └─ SQLite DB + uploaded files on a persistent volume
+Browser ──► Node/Express ..... static site + /api/* + /media/*   [k8s: 1 replica]
+                └── SQLite + uploads on a persistent volume (/data)
 ```
 For **local dev**, the Node server can also serve the static site itself, so a
 single `node server/src/index.js` serves everything on one port.
@@ -227,28 +215,17 @@ npm test          # 119 tests; Playwright auto-starts the Node server on :3000
 
 ### Docker
 ```bash
-# Static site (nginx, port 8080)
-docker build -t gmvis:latest .
-
-# API (Node, port 3001) — build from repo root
-docker build -f server/Dockerfile -t gmvis-api:latest .
+# Production image (Node, serves static site + /api + /media on port 3001)
+docker build -f server/Dockerfile -t gmvis-web:local .
 docker run --rm -p 3001:3001 --read-only --tmpfs /tmp -v gmvis-data:/data \
-  -e ADMIN_PASSWORD=secret -e SESSION_SECRET=dev-secret gmvis-api:latest
+  -e ADMIN_PASSWORD=secret -e SESSION_SECRET=dev-secret gmvis-web:local
 ```
 
-### Kubernetes
-```bash
-cd k8s
-kustomize edit set image gmvis=<registry>/gmvis:1.0.0
-kustomize edit set image gmvis-api=<registry>/gmvis-api:1.0.0
-cd ..
-# Set ADMIN_PASSWORD/SESSION_SECRET (edit k8s/api-secret.yaml or create the secret),
-# set the domain + ingressClassName in k8s/ingress.yaml, then:
-kubectl apply -k k8s/
-```
-Both deployments run as non-root with `readOnlyRootFilesystem`, dropped
-capabilities, and `seccompProfile: RuntimeDefault`. The API pod mounts a PVC at
-`/data`. The ingress raises `proxy-body-size` to 200 MB for video uploads.
+### Deploy (Kubernetes / ArgoCD)
+Deploys are release-driven: publish a GitHub Release and
+`.github/workflows/deploy.yml` builds `ghcr.io/borisnan99/gmvis-web` and
+syncs the ArgoCD app `gmvis-prod` (namespace `prod-gmvis`). Chart:
+`deploy/helm/gmvis/`. First-time bootstrap: `docs/deployment-runbook.md`.
 
 ---
 
@@ -263,10 +240,9 @@ capabilities, and `seccompProfile: RuntimeDefault`. The API pod mounts a PVC at
   image; the startup warning is suppressed in `db.js`). Swappable for
   `better-sqlite3` if a "stable" dep is required (adds a native build).
 - **Web3Forms access key is a public client-side key** — safe to commit/embed.
-- **Secrets**: `k8s/api-secret.yaml` ships with **placeholder** values — must be
-  changed before deploying.
-- **Two Docker images, one repo**: the nginx image and the API image both COPY the
-  static site; keep their file lists in sync when adding pages.
+- **Secrets**: Production secrets are SealedSecrets in
+  `deploy/helm/gmvis/templates/sealed-secrets/prod/`, generated via
+  `deploy/seal-secrets.sh` (see the runbook).
 - **Dev environment is Windows** (PowerShell + Git Bash). Files use **LF** endings.
 - **SQLite = single writer** → the API runs as a **single replica** (`Recreate`
   strategy) on a `ReadWriteOnce` volume. Don't scale it to multiple replicas without
@@ -285,5 +261,4 @@ capabilities, and `seccompProfile: RuntimeDefault`. The API pod mounts a PVC at
 - DB schema → `server/src/db.js`
 - Auth → `server/src/auth.js`
 - Design system / tokens → `assets/styles.css`
-- nginx behaviour → `nginx/default.conf`
-- Deployment → `Dockerfile`, `server/Dockerfile`, `k8s/`
+- Deployment → `server/Dockerfile`, `deploy/helm/gmvis/`, `.github/workflows/deploy.yml`

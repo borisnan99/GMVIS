@@ -47,15 +47,13 @@ Then open `http://localhost:8080` in your browser.
 
 The public site is static, but blog posts and gallery media (images **and** videos) are managed through a login-protected admin portal at **`/admin.html`** and stored by a small backend API.
 
-> ⚠️ **Before deploying:** set a strong `ADMIN_PASSWORD` and a long random `SESSION_SECRET`. The defaults are for local development only, and `k8s/api-secret.yaml` ships with placeholders — change them, or create the secret with `kubectl create secret` (see [Kubernetes](#kubernetes)).
+> ⚠️ **Before deploying:** set a strong `ADMIN_PASSWORD` and a long random `SESSION_SECRET`. The defaults are for local development only — production values are SealedSecrets generated per [`docs/deployment-runbook.md`](docs/deployment-runbook.md).
 
 **Architecture**
 
 ```
-Browser ─┬─► nginx ............ static site (HTML/CSS/JS)        [k8s: 2 replicas]
-         ├─► Node/Express ..... /api/*  (blogs, media, auth)     [k8s: 1 replica]
-         └─► Node/Express ..... /media/* (uploaded files, range-enabled)
-                               └─ SQLite DB + uploaded files on a persistent volume
+Browser ──► Node/Express ..... static site + /api/* + /media/*   [k8s: 1 replica]
+                └── SQLite + uploads on a persistent volume (/data)
 ```
 
 - **Backend** lives in [`server/`](server/): Express + Node's built-in `node:sqlite` (no native deps). It exposes the REST API, serves uploaded media with HTTP range support (so videos stream/seek), and — for local dev — can also serve the static site itself.
@@ -100,80 +98,27 @@ npm test            # run the full suite
 npm run test:report # open the HTML report
 ```
 
-## Docker
+## Deployment
 
-The site ships as a small (~77 MB) nginx image that runs as a **non-root** user on port **8080** and works with a **read-only root filesystem**.
+The site deploys to Kubernetes via **ArgoCD** with release-driven CI/CD.
+One image — `ghcr.io/borisnan99/gmvis-web`, built from
+[`server/Dockerfile`](server/Dockerfile) — serves the static site, the
+`/api` routes, and uploaded `/media`.
 
-```bash
-# Build
-docker build -t gmvis:latest .
+- Publishing a **GitHub Release** builds the image and deploys it
+  (`.github/workflows/deploy.yml` → ArgoCD app `gmvis-prod`,
+  namespace `prod-gmvis`).
+- The Helm chart lives in [`deploy/helm/gmvis/`](deploy/helm/gmvis/);
+  secrets are committed as SealedSecrets.
+- One-off cluster bootstrap (ArgoCD account, sealed secrets, first release):
+  see [`docs/deployment-runbook.md`](docs/deployment-runbook.md).
 
-# Run locally (mimicking the production hardening)
-docker run --rm -p 8080:8080 \
-  --user 101:101 --read-only --tmpfs /tmp --tmpfs /var/cache/nginx \
-  gmvis:latest
-```
-
-Then open `http://localhost:8080`. A health endpoint is exposed at `/healthz`.
-
-Server config (gzip, long-lived asset caching, security headers, pretty URLs, branded `404.html`) lives in [`nginx/default.conf`](nginx/default.conf).
-
-### API image
-
-The admin API is a second image (Node, non-root, read-only-root compatible), built from the repo root:
+Build and run the production image locally:
 
 ```bash
-docker build -f server/Dockerfile -t gmvis-api:latest .
-
-# Run it (serves the whole site + API + media on :3001)
+docker build -f server/Dockerfile -t gmvis-web:local .
 docker run --rm -p 3001:3001 \
-  --read-only --tmpfs /tmp -v gmvis-data:/data \
-  -e ADMIN_PASSWORD=secret -e SESSION_SECRET=dev-secret \
-  gmvis-api:latest
+  -e ADMIN_PASSWORD=dev-password -e SESSION_SECRET=dev-secret-0123456789abcdef \
+  -v gmvis-data:/data gmvis-web:local
+# → http://localhost:3001
 ```
-
-The SQLite DB and uploaded media live in the `/data` volume, so they survive restarts.
-
-### Push to a registry
-
-```bash
-docker tag gmvis:latest     <registry>/gmvis:1.0.0       # static site (nginx)
-docker tag gmvis-api:latest <registry>/gmvis-api:1.0.0   # admin API (node)
-docker push <registry>/gmvis:1.0.0
-docker push <registry>/gmvis-api:1.0.0
-```
-
-## Kubernetes
-
-Manifests live in [`k8s/`](k8s/):
-
-| Resource | Purpose |
-|---|---|
-| `deployment.yaml` / `service.yaml` | Static site (nginx), 2 replicas |
-| `api-deployment.yaml` / `api-service.yaml` | Admin API (Node), 1 replica, `Recreate` strategy |
-| `api-pvc.yaml` | `ReadWriteOnce` volume for the SQLite DB + uploaded media |
-| `api-secret.yaml` | `ADMIN_PASSWORD` + `SESSION_SECRET` |
-| `ingress.yaml` | Routes `/api` and `/media` → API, everything else → nginx |
-
-1. Set your images (kustomize):
-   ```bash
-   cd k8s
-   kustomize edit set image gmvis=<registry>/gmvis:1.0.0
-   kustomize edit set image gmvis-api=<registry>/gmvis-api:1.0.0
-   cd ..
-   ```
-2. Set the admin secret. **Edit the placeholders in `k8s/api-secret.yaml`**, or (preferred) create it out-of-band and drop it from the kustomization:
-   ```bash
-   kubectl create secret generic gmvis-api-secret \
-     --from-literal=ADMIN_PASSWORD='your-strong-password' \
-     --from-literal=SESSION_SECRET="$(openssl rand -hex 32)"
-   ```
-3. Set your domain and ingress class in `k8s/ingress.yaml` (replace `gmvis.example.com` and `ingressClassName`). The ingress already raises `proxy-body-size` to 200 MB for video uploads.
-4. Deploy and check rollout:
-   ```bash
-   kubectl apply -k k8s/
-   kubectl rollout status deployment/gmvis-web
-   kubectl rollout status deployment/gmvis-api
-   ```
-
-Both deployments run as non-root with `runAsNonRoot`, `readOnlyRootFilesystem`, all Linux capabilities dropped, and `seccompProfile: RuntimeDefault`. The nginx pods use `emptyDir` volumes at `/tmp` and `/var/cache/nginx`; the API pod mounts the persistent volume at `/data` (plus an `emptyDir` `/tmp`).
