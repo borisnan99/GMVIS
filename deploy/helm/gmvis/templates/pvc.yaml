@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gmvis-api-data
+  labels:
+    {{- include "gmvis.labels" . | nindent 4 }}
+    app.kubernetes.io/component: web
+  annotations:
+    # This volume holds the SQLite database and every admin upload.
+    # Never let an ArgoCD auto-prune delete it, even if the PVC is
+    # removed from the chart by mistake.
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ .Values.storage.storageClassName }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.size }}
