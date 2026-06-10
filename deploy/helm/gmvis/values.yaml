@@ -1,0 +1,41 @@
+# Default values. Production overrides live in values-prod.yaml.
+
+image:
+  repository: ghcr.io/borisnan99/gmvis-web
+  # REQUIRED — no default on purpose. CI sets it at deploy time via
+  # `argocd app set -p image.tag=sha-<short>`; local renders must pass
+  # `--set image.tag=<something>`. The chart fails to render without it
+  # so a deploy can never silently ship a stale or floating tag.
+  tag: ""
+  pullPolicy: IfNotPresent
+  pullSecretName: ghcr-pull
+
+namespace: prod-gmvis
+
+web:
+  replicas: 1
+  port: 3001
+  resources:
+    requests: { cpu: 25m, memory: 64Mi }
+    limits:   { cpu: 500m, memory: 256Mi }
+
+# SQLite DB + admin uploads live here. ReadWriteOnce, single writer.
+storage:
+  size: 5Gi
+  storageClassName: nfs-client
+
+ingress:
+  host: gmvis.org
+  tlsSecretName: gmvis-web-tls
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    cloudflare.com/dns-enabled: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # Admin video uploads go up to 200 MB (multer limit in server/src/index.js).
+    nginx.ingress.kubernetes.io/proxy-body-size: "200m"
+
+# Non-secret env for the web container. ADMIN_PASSWORD and SESSION_SECRET
+# come from the `gmvis-app` SealedSecret.
+config:
+  NODE_ENV: production
+  COOKIE_SECURE: "true"   # cookies require HTTPS; TLS terminates at the ingress

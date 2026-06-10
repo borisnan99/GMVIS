@@ -1,0 +1,7 @@
+# Prod overrides. Defaults in values.yaml are already prod-shaped; this file
+# exists so environment-specific values have an explicit home (and so the CI
+# `--values values-prod.yaml` flag matches the bcewhub pattern). Add a
+# values-staging.yaml alongside if a staging environment appears later.
+
+ingress:
+  host: gmvis.org
