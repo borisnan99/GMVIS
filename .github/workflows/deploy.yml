@@ -1,0 +1,170 @@
+name: Deploy
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch, tag, or SHA to build + deploy"
+        required: true
+        default: "main"
+      deploy:
+        description: "Deploy to gmvis-prod after build?"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/gmvis-web
+
+jobs:
+  build-push:
+    name: Build and push image
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.image_tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute tags
+        id: meta
+        run: |
+          SHORT_SHA=$(git rev-parse --short=12 HEAD)
+          IMAGE_TAG="sha-${SHORT_SHA}"
+          TAGS="${IMAGE_NAME}:${IMAGE_TAG}"
+          case "${{ github.event_name }}" in
+            release)
+              TAGS="${TAGS},${IMAGE_NAME}:${{ github.event.release.tag_name }},${IMAGE_NAME}:latest"
+              ;;
+            workflow_dispatch)
+              TAGS="${TAGS},${IMAGE_NAME}:manual-${{ github.run_number }}"
+              ;;
+          esac
+          {
+            echo "image_tag=${IMAGE_TAG}"
+            echo "tags<<TAGS_EOF"
+            echo "${TAGS}"
+            echo "TAGS_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: server/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+
+  deploy:
+    name: Deploy to prod
+    concurrency:
+      group: deploy-gmvis-prod
+      cancel-in-progress: false
+    needs: build-push
+    if: >
+      github.event_name == 'release' ||
+      (github.event_name == 'workflow_dispatch' && inputs.deploy == true)
+    runs-on: ubuntu-latest
+    env:
+      APP: gmvis-prod
+      NAMESPACE: prod-gmvis
+      CHART_PATH: deploy/helm/gmvis
+      IMAGE_TAG: ${{ needs.build-push.outputs.image_tag }}
+      REF: ${{ inputs.ref || github.ref_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.REF }}
+
+      # Pin the argocd CLI so a downstream release on the argoproj/argo-cd
+      # `latest` channel cannot quietly change deploy semantics (flag
+      # rename, default flip) overnight. v3.4.2 is the version validated
+      # by the bcewhub-app deploy pipeline this workflow mirrors. Bump
+      # deliberately after smoke-testing in a workflow_dispatch run.
+      - name: Install argocd CLI
+        env:
+          ARGOCD_VERSION: v3.4.2
+        run: |
+          curl --retry 5 --retry-delay 5 --retry-connrefused -fsSL \
+            -o /tmp/argocd \
+            "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64"
+          chmod +x /tmp/argocd
+          sudo mv /tmp/argocd /usr/local/bin/argocd
+          argocd version --client
+
+      - name: Deploy via ArgoCD
+        env:
+          ARGOCD_SERVER:   ${{ secrets.ARGOCD_SERVER }}
+          ARGOCD_USERNAME: ${{ secrets.ARGOCD_USERNAME }}
+          ARGOCD_PASSWORD: ${{ secrets.ARGOCD_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          # Transient RPC / TCP blips between GHA and the ArgoCD endpoint do
+          # happen; retry every call a handful of times before giving up.
+          retry() {
+            local i=0
+            until "$@"; do
+              i=$((i+1))
+              if [ $i -ge 5 ]; then
+                echo "::error::FAILED after 5 attempts: $*" >&2
+                return 1
+              fi
+              echo "::warning::attempt $i failed, retrying in 15s..." >&2
+              sleep 15
+            done
+          }
+
+          retry argocd login "$ARGOCD_SERVER" \
+            --username "$ARGOCD_USERNAME" \
+            --password "$ARGOCD_PASSWORD" \
+            --grpc-web
+
+          retry argocd app create "$APP" \
+            --upsert \
+            --repo "https://github.com/borisnan99/GMVIS.git" \
+            --path "$CHART_PATH" \
+            --revision "$REF" \
+            --dest-server "https://kubernetes.default.svc" \
+            --dest-namespace "$NAMESPACE" \
+            --sync-option CreateNamespace=true \
+            --sync-option ServerSideApply=true \
+            --sync-policy automated \
+            --auto-prune \
+            --self-heal \
+            --values "values-prod.yaml" \
+            --helm-set "image.tag=$IMAGE_TAG" \
+            --grpc-web
+
+          retry argocd app set "$APP" -p "image.tag=$IMAGE_TAG" --grpc-web
+
+          # Do NOT run `argocd app sync` here. With `--sync-policy automated`
+          # the `app set` above already changes desired state, which the
+          # controller reconciles by starting an automated sync within seconds
+          # (a spec/param change is reacted to immediately — it does not wait
+          # for the ~3-min git poll). An explicit `app sync` then collides with
+          # that in-flight auto-sync and fails with "another operation is
+          # already in progress". One syncer only: ArgoCD owns the sync, CI
+          # just changes the tag and waits for the result.
+          #
+          # `app get --refresh` forces a comparison refresh and blocks until
+          # the new desired state (and the OutOfSync it produces) is registered
+          # server-side, closing the race where `app wait` could otherwise read
+          # the prior Synced/Healthy state and return before the new tag rolls.
+          retry argocd app get "$APP" --refresh --grpc-web >/dev/null
+          retry argocd app wait "$APP" --sync --health --operation --timeout 600 --grpc-web

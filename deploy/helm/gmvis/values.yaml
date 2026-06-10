@@ -10,6 +10,8 @@ image:
   pullPolicy: IfNotPresent
   pullSecretName: ghcr-pull
 
+# Informational only — no template consumes this. The actual namespace is set
+# by ArgoCD's --dest-namespace (see .github/workflows/deploy.yml).
 namespace: prod-gmvis
 
 web:
