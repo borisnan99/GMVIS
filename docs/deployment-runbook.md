@@ -51,11 +51,18 @@ HTTPS endpoint, and the Cloudflare integration that honours the
 
 ```bash
 # on a machine with argocd CLI + admin access
+
+# 1. Declare the account in argocd-cm (idempotent):
+kubectl -n argocd patch configmap argocd-cm --type merge \
+  -p '{"data":{"accounts.gmvis-ci":"login"}}'
+# 2. Grant it permissions on the app in argocd-rbac-cm, e.g. add to policy.csv:
+#      p, gmvis-ci, applications, get,  default/gmvis-prod, allow
+#      p, gmvis-ci, applications, sync, default/gmvis-prod, allow
+#      p, gmvis-ci, applications, update, default/gmvis-prod, allow
+# 3. Set its password:
 argocd account update-password \
   --account gmvis-ci \
   --new-password 'a-long-random-password'
-# and grant it app:gmvis-prod permissions via your argocd-rbac-cm, e.g.:
-#   p, gmvis-ci, applications, *, default/gmvis-prod, allow
 ```
 
 GitHub → repo **borisnan99/GMVIS** → Settings → Secrets and variables →
@@ -189,6 +196,8 @@ kubectl -n prod-gmvis rollout restart deploy/gmvis-web
 kubectl -n prod-gmvis rollout status deploy/gmvis-web
 # reload /blog.html — the test post and media must still be there
 ```
+
+> **Note:** self-heal may revert the restart annotation and bounce the pod a second time — harmless for this check; `argocd app actions run gmvis-prod restart --kind Deployment` is the drift-free alternative.
 
 Delete the test post/media via `/admin.html` when done.
 
