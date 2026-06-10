@@ -8,6 +8,9 @@ metadata:
 spec:
   # Single replica: the SQLite DB + uploads live on a ReadWriteOnce volume and
   # SQLite expects a single writer. Recreate avoids two pods sharing the volume.
+  {{- if gt (int .Values.web.replicas) 1 }}
+  {{- fail "web.replicas must be 1 — single SQLite writer on a ReadWriteOnce volume" }}
+  {{- end }}
   replicas: {{ .Values.web.replicas }}
   strategy:
     type: Recreate
@@ -27,8 +30,10 @@ spec:
         fsGroup: 1000            # so the mounted volume is writable by the node user
         seccompProfile:
           type: RuntimeDefault
+      {{- with .Values.image.pullSecretName }}
       imagePullSecrets:
-        - name: {{ .Values.image.pullSecretName }}
+        - name: {{ . }}
+      {{- end }}
       containers:
         - name: web
           image: {{ include "gmvis.image" . }}
