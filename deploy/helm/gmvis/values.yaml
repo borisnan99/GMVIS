@@ -1,0 +1,53 @@
+# Default values. Production overrides live in values-prod.yaml.
+
+image:
+  repository: ghcr.io/borisnan99/gmvis-web
+  # REQUIRED — no default on purpose. CI sets it at deploy time via
+  # `argocd app set -p image.tag=sha-<short>`; local renders must pass
+  # `--set image.tag=<something>`. The chart fails to render without it
+  # so a deploy can never silently ship a stale or floating tag.
+  tag: ""
+  pullPolicy: IfNotPresent
+  pullSecretName: ghcr-pull
+
+# Informational only — no template consumes this. The actual namespace is set
+# by ArgoCD's --dest-namespace (see .github/workflows/deploy.yml).
+namespace: prod-gmvis
+
+web:
+  replicas: 1
+  port: 3001
+  resources:
+    requests: { cpu: 25m, memory: 64Mi }
+    limits:   { cpu: 500m, memory: 256Mi }
+
+# SQLite DB + admin uploads live here. ReadWriteOnce, single writer.
+storage:
+  size: 5Gi
+  storageClassName: nfs-client
+
+ingress:
+  host: gmvis.org
+  tlsSecretName: gmvis-web-tls
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    cloudflare.com/dns-enabled: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # Multer caps uploads at exactly 200 MiB (server/src/index.js). 210m gives
+    # the multipart envelope headroom so the app's friendly JSON 400 is always
+    # what enforces the limit, never nginx's HTML 413.
+    nginx.ingress.kubernetes.io/proxy-body-size: "210m"
+    # Large video range-requests can stream for a long time; don't let the
+    # 60s proxy defaults kill them, and don't spool responses to the
+    # controller's disk. Request buffering stays ON (default) on purpose:
+    # nginx absorbs slow admin uploads and forwards them fast, which keeps
+    # Node's default 300s requestTimeout from aborting slow connections.
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+
+# Non-secret env for the web container. ADMIN_PASSWORD and SESSION_SECRET
+# come from the `gmvis-app` SealedSecret.
+config:
+  NODE_ENV: production
+  COOKIE_SECURE: "true"   # cookies require HTTPS; TLS terminates at the ingress

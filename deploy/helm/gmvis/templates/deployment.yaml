@@ -1,23 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gmvis-api
+  name: gmvis-web
   labels:
-    app.kubernetes.io/name: gmvis-api
-    app.kubernetes.io/part-of: gmvis
+    {{- include "gmvis.labels" . | nindent 4 }}
+    app.kubernetes.io/component: web
 spec:
   # Single replica: the SQLite DB + uploads live on a ReadWriteOnce volume and
   # SQLite expects a single writer. Recreate avoids two pods sharing the volume.
-  replicas: 1
+  {{- if gt (int .Values.web.replicas) 1 }}
+  {{- fail "web.replicas must be 1 — single SQLite writer on a ReadWriteOnce volume" }}
+  {{- end }}
+  replicas: {{ .Values.web.replicas }}
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app.kubernetes.io/name: gmvis-api
+      {{- include "gmvis.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: gmvis-api
+        {{- include "gmvis.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/part-of: gmvis
     spec:
       securityContext:
@@ -27,34 +30,37 @@ spec:
         fsGroup: 1000            # so the mounted volume is writable by the node user
         seccompProfile:
           type: RuntimeDefault
+      {{- with .Values.image.pullSecretName }}
+      imagePullSecrets:
+        - name: {{ . }}
+      {{- end }}
       containers:
-        - name: api
-          # Replace with your registry/tag, e.g. ghcr.io/borisnan99/gmvis-api:1.0.0
-          image: gmvis-api:latest
-          imagePullPolicy: IfNotPresent
+        - name: web
+          image: {{ include "gmvis.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 3001
+              containerPort: {{ .Values.web.port }}
           env:
             - name: PORT
-              value: "3001"
+              value: {{ .Values.web.port | quote }}
             - name: DATA_DIR
               value: /data
             - name: SITE_DIR
               value: /site
-            - name: NODE_ENV
-              value: production
-            - name: COOKIE_SECURE
-              value: "true"          # cookies require HTTPS (TLS terminates at the ingress)
+            {{- range $k, $v := .Values.config }}
+            - name: {{ $k }}
+              value: {{ $v | quote }}
+            {{- end }}
             - name: ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: gmvis-api-secret
+                  name: gmvis-app
                   key: ADMIN_PASSWORD
             - name: SESSION_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: gmvis-api-secret
+                  name: gmvis-app
                   key: SESSION_SECRET
           readinessProbe:
             httpGet: { path: /api/health, port: http }
@@ -68,12 +74,7 @@ spec:
             timeoutSeconds: 3
             failureThreshold: 3
           resources:
-            requests:
-              cpu: 25m
-              memory: 64Mi
-            limits:
-              cpu: 500m
-              memory: 256Mi
+            {{- toYaml .Values.web.resources | nindent 12 }}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true

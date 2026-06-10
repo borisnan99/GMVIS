@@ -16,8 +16,7 @@ RUN npm ci --omit=dev && npm cache clean --force
 # Application source
 COPY server/src ./src
 
-# Static site, so this image can also serve the whole site standalone (local
-# dev). In Kubernetes nginx fronts the static site and this serves /api + /media.
+# Static site — this image serves the whole site in production (single image, no nginx layer).
 COPY index.html about.html activities.html news.html blog.html gallery.html \
      get-involved.html contact.html complaints.html 404.html admin.html \
      /site/

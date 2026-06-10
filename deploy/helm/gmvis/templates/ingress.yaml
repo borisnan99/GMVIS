@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gmvis-web
+  labels:
+    {{- include "gmvis.labels" . | nindent 4 }}
+    app.kubernetes.io/component: web
+  annotations:
+    {{- range $k, $v := .Values.ingress.annotations }}
+    {{ $k }}: {{ $v | quote }}
+    {{- end }}
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host }}
+      secretName: {{ .Values.ingress.tlsSecretName }}
+  rules:
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          # Single backend: the app serves the static site, /api and /media.
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: gmvis-web
+                port:
+                  name: http
