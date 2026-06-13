@@ -98,3 +98,58 @@ test.describe("Policy pages", () => {
     }
   });
 });
+
+/* ============================================================
+   Product-owner revisions
+   ============================================================ */
+test.describe("Product-owner revisions", () => {
+  test("footer lists affiliated organisations as clickable links", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator(".footer-partners a")).toHaveCount(4);
+    await expect(page.locator('.footer-partners a[href*="goalballuk"]')).toHaveCount(1);
+    await expect(page.locator('.footer-partners a[href*="ecb.co.uk"]')).toHaveCount(1);
+    await expect(page.locator('.footer-partners a[href*="bcew"]')).toHaveCount(1);
+    await expect(page.locator('.footer-partners a[href*="britishblindsport"]')).toHaveCount(1);
+  });
+
+  test("complaint call-to-action is softened to 'Share a concern'", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator(".site-footer")).toContainText("Share a concern");
+    await expect(page.locator("body")).not.toContainText("Make a complaint");
+    await page.goto("/complaints.html");
+    await expect(page.locator("h1")).not.toHaveText(/make a complaint/i);
+  });
+
+  test("get-involved has a sponsors section with benefits and logo slots", async ({ page }) => {
+    await page.goto("/get-involved.html");
+    await expect(page.locator("#spon-h")).toBeVisible();
+    await expect(page.locator(".sponsor-slot")).toHaveCount(4);
+    await expect(page.locator("body")).toContainText(/become a sponsor/i);
+  });
+
+  test("contact form lets you pick individual sports and answer light questions", async ({ page }) => {
+    await page.goto("/contact.html");
+    await expect(page.locator('input[name="c-sports"]').first()).toBeAttached();
+    await expect(page.locator('input[name="c-experience"]').first()).toBeAttached();
+    await expect(page.locator('input[name="c-occupation"]').first()).toBeAttached();
+  });
+
+  test("football is presented as coming soon and cricket is at Astley Bridge", async ({ page }) => {
+    await page.goto("/activities.html");
+    await expect(page.locator("#football")).toContainText(/coming soon/i);
+    await expect(page.locator("body")).toContainText("Astley Bridge");
+    await expect(page.locator("body")).not.toContainText(/sight categories/i);
+  });
+
+  test("home reflects 2024 founding and thanks volunteers", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("body")).toContainText("Est. 2024");
+    await expect(page.locator("body")).not.toContainText("Est. 2019");
+    await expect(page.locator("#vol-h")).toBeVisible();
+  });
+
+  test("activities page links to YouTube", async ({ page }) => {
+    await page.goto("/activities.html");
+    await expect(page.locator('main a[aria-label*="YouTube"]')).toHaveCount(1);
+  });
+});
