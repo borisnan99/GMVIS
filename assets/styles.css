@@ -378,6 +378,36 @@ legend { font-family: var(--font-head); font-weight: 700; padding: 0 10px; font-
 [data-contrast="high"] .gallery-item figcaption { color: var(--ink); }
 .content-empty { padding: 48px 24px; text-align: center; color: var(--ink-soft); border: 2px dashed var(--line); border-radius: var(--radius); grid-column: 1 / -1; }
 
+/* ---------- Global "Listen to this page" button (injected on every page) ---------- */
+.page-reader {
+  position: fixed; left: 18px; bottom: 18px; z-index: 150;
+  display: inline-flex; align-items: center; gap: 9px;
+  background: var(--purple-700); color: var(--gold-300);
+  border: 3px solid var(--gold-400); border-radius: 999px;
+  padding: 12px 18px; cursor: pointer; box-shadow: var(--shadow-lg);
+  font-family: var(--font-head); font-weight: 700; font-size: .95rem;
+  transition: transform var(--t);
+}
+.page-reader:hover { transform: translateY(-2px); }
+.page-reader svg { width: 22px; height: 22px; flex: none; }
+.page-reader[data-speaking="true"] { background: var(--gold-400); color: var(--purple-900); border-color: var(--gold-400); }
+[data-contrast="high"] .page-reader { background: #000; color: var(--gold-300); }
+@media (max-width: 560px) { .page-reader { padding: 11px 14px; font-size: .88rem; } }
+
+/* ---------- Footer policy links ---------- */
+.footer-policies { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* ---------- Social card (home page) ---------- */
+.social-card { background: linear-gradient(160deg, var(--purple-800), var(--purple-600)); color: #fff; border-radius: var(--radius); padding: clamp(28px, 4vw, 48px); box-shadow: var(--shadow-lg); }
+[data-contrast="high"] .social-card { background: #0B0B0B; border: 1px solid #4D4326; }
+.social-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); margin-top: 26px; }
+.social-link { display: flex; align-items: center; gap: 14px; padding: 16px 18px; background: rgba(255,255,255,.08); border: 1px solid rgba(247,220,151,.25); border-radius: var(--radius-sm); color: #fff; text-decoration: none; font-family: var(--font-head); font-weight: 700; transition: background var(--t), color var(--t), transform var(--t); }
+.social-link:hover { background: var(--gold-400); color: var(--purple-900); border-color: var(--gold-400); transform: translateY(-2px); }
+.social-link svg { width: 28px; height: 28px; flex: none; }
+.social-link .sl-handle { display: block; font-family: var(--font-body); font-weight: 400; font-size: .82rem; opacity: .85; }
+[data-contrast="high"] .social-link { background: #000; border-color: #4D4326; color: #fff; }
+[data-contrast="high"] .social-link:hover { background: var(--gold-400); color: #000; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1040px) {
   .hamburger { display: inline-flex; }

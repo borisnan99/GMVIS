@@ -75,6 +75,7 @@
     wireToolbar();
     wireNav();
     wireReadAloud();
+    wirePageReader();
     wireForms();
     apply();
     /* Hide decorative SVGs from AT (icon cells and checklist marks) */
@@ -193,6 +194,57 @@
       function stop() { window.speechSynthesis.cancel(); reset(btn, labelEl, iconPlay); }
     });
     window.addEventListener("beforeunload", function () { if (supported) window.speechSynthesis.cancel(); });
+  }
+
+  /* ---------- Global "Listen to this page" control (every page) ----------
+     Reads the whole <main> aloud. Injected so all pages — including new ones —
+     have full text-to-speech, not just a curated intro. */
+  function wirePageReader() {
+    if (!("speechSynthesis" in window)) return;
+    var main = document.getElementById("main");
+    if (!main) return;
+
+    var iconPlay = '<path d="M6 4l14 8-14 8V4z"/>';
+    var iconStop = '<rect x="6" y="6" width="12" height="12" rx="2"/>';
+
+    var btn = document.createElement("button");
+    btn.className = "page-reader";
+    btn.type = "button";
+    btn.setAttribute("aria-label", "Listen to this page");
+    btn.setAttribute("data-speaking", "false");
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + iconPlay + '</svg><span class="pr-label">Listen to page</span>';
+    var labelEl = btn.querySelector(".pr-label");
+
+    function reset() {
+      btn.setAttribute("data-speaking", "false");
+      btn.setAttribute("aria-label", "Listen to this page");
+      if (labelEl) labelEl.textContent = "Listen to page";
+      var ic = btn.querySelector("svg"); if (ic) ic.innerHTML = iconPlay;
+    }
+    function pageText() {
+      var clone = main.cloneNode(true);
+      clone.querySelectorAll('.readaloud, .page-reader, script, style, [data-read-text], [aria-hidden="true"]')
+        .forEach(function (n) { n.remove(); });
+      return (clone.textContent || "").replace(/\s+/g, " ").trim();
+    }
+
+    btn.addEventListener("click", function () {
+      if (btn.getAttribute("data-speaking") === "true") { window.speechSynthesis.cancel(); reset(); return; }
+      document.querySelectorAll('[data-speaking="true"]').forEach(function (o) { o.setAttribute("data-speaking", "false"); });
+      window.speechSynthesis.cancel();
+      var text = pageText();
+      if (!text) return;
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.96; u.pitch = 1;
+      u.onend = u.onerror = reset;
+      btn.setAttribute("data-speaking", "true");
+      btn.setAttribute("aria-label", "Stop reading this page");
+      if (labelEl) labelEl.textContent = "Stop";
+      var ic = btn.querySelector("svg"); if (ic) ic.innerHTML = iconStop;
+      window.speechSynthesis.speak(u);
+    });
+
+    document.body.appendChild(btn);
   }
 
   /* ---------- Forms: validation + Web3Forms submit ---------- */

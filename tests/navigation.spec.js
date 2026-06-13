@@ -120,7 +120,7 @@ test("Footer navigation links resolve to valid in-site pages", async ({ page }) 
   for (const link of footerLinks) {
     const href = await link.getAttribute("href");
     if (!href || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("http")) continue;
-    const res = await page.request.get(`http://localhost:3000/${href}`);
+    const res = await page.request.get(href);
     expect(res.status(), `Footer link ${href} is broken`).toBe(200);
   }
 });

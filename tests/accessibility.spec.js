@@ -11,6 +11,8 @@ const PAGES = [
   { name: "Get Involved",path: "/get-involved.html" },
   { name: "Contact",     path: "/contact.html" },
   { name: "Complaints",  path: "/complaints.html" },
+  { name: "Safeguarding",path: "/safeguarding.html" },
+  { name: "Constitution",path: "/constitution.html" },
 ];
 
 for (const { name, path } of PAGES) {

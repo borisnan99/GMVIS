@@ -13,18 +13,19 @@ module.exports = defineConfig({
   globalSetup: "./tests/global-setup.js",
   metadata: { adminPassword: ADMIN_PASSWORD },
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: "http://localhost:3100",
     headless: true,
     screenshot: "only-on-failure",
     video: "off",
   },
   webServer: {
+    // Dedicated test port (3100) to avoid colliding with a dev server on 3000.
     command: "node server/src/index.js",
-    url: "http://localhost:3000/api/health",
+    url: "http://localhost:3100/api/health",
     reuseExistingServer: false,
     timeout: 30_000,
     env: {
-      PORT: "3000",
+      PORT: "3100",
       DATA_DIR: "./.pwtest-data",
       SITE_DIR: ".",
       ADMIN_PASSWORD: ADMIN_PASSWORD,
