@@ -17,9 +17,9 @@ RUN npm ci --omit=dev && npm cache clean --force
 COPY server/src ./src
 
 # Static site — this image serves the whole site in production (single image, no nginx layer).
-COPY index.html about.html activities.html news.html blog.html gallery.html \
-     get-involved.html contact.html complaints.html 404.html admin.html \
-     /site/
+# Glob every root HTML page so the image never drifts out of sync with the site
+# (an explicit allowlist previously dropped safeguarding.html and constitution.html).
+COPY *.html /site/
 COPY assets/  /site/assets/
 COPY uploads/ /site/uploads/
 
