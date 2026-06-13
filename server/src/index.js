@@ -1,7 +1,7 @@
 "use strict";
-/* Greater Manchester Vis — admin API
+/* Greater Manchester Vis — production server (single image)
    Serves: REST API (/api/*), uploaded media (/media/*, with range support),
-   and the static site (for standalone/local use; in production nginx fronts it). */
+   and the static site. Express is the production static server — no nginx layer. */
 
 const path = require("path");
 const fs = require("fs");
@@ -99,6 +99,20 @@ function str(v, max) {
 /* ---------- App ---------- */
 const app = express();
 app.disable("x-powered-by");
+// Behind ingress-nginx, req.ip must come from X-Forwarded-For or the login
+// throttle keys every visitor to the controller pod's IP (one shared bucket).
+// Direct connections (local dev/tests) are unaffected: no XFF header, same IP.
+app.set("trust proxy", 1);
+
+/* ---- Security headers (previously sent by nginx/default.conf) ---- */
+app.use(function (req, res, next) {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+  next();
+});
+
 app.use(express.json({ limit: "1mb" }));
 
 /* ---- Auth ---- */
@@ -310,8 +324,24 @@ app.use("/media", express.static(UPLOAD_DIR, {
 /* ---- API 404 (so unknown /api paths don't fall through to static) ---- */
 app.use("/api", function (req, res) { res.status(404).json({ error: "Not found." }); });
 
-/* ---- Static site (standalone / local dev; nginx fronts this in production) ---- */
-app.use(express.static(SITE_DIR, { extensions: ["html"] }));
+/* ---- Static site (Express is the production server — single image, no nginx) ---- */
+app.use(express.static(SITE_DIR, {
+  extensions: ["html"],
+  setHeaders: function (res, filePath) {
+    if (filePath.includes("/assets/") || filePath.includes("/uploads/")) {
+      // Long-lived caching for static assets, mirroring nginx's `expires 30d`
+      res.setHeader("Cache-Control", "public, max-age=2592000");
+    } else if (filePath.endsWith(".html")) {
+      // Revalidate HTML every request, mirroring nginx's `expires -1`
+      res.setHeader("Cache-Control", "no-cache");
+    }
+  },
+}));
+
+/* ---- Branded 404 for everything else (nginx used to serve this) ---- */
+app.use(function (req, res) {
+  res.status(404).sendFile(path.join(SITE_DIR, "404.html"));
+});
 
 app.listen(PORT, function () {
   console.log("GMVIS API listening on http://localhost:" + PORT);

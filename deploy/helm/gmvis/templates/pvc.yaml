@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gmvis-api-data
+  labels:
+    {{- include "gmvis.labels" . | nindent 4 }}
+    app.kubernetes.io/component: web
+  annotations:
+    # This volume holds the SQLite database and every admin upload.
+    # Prune=false: an ArgoCD auto-prune must never delete it, even if the
+    # PVC is removed from the chart by mistake. Delete=false: it also
+    # survives a cascading `argocd app delete`. Note: a retained PVC shows
+    # the app as OutOfSync if the PVC is ever intentionally removed from
+    # the chart — that's the alarm working as intended.
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ .Values.storage.storageClassName }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.size }}
