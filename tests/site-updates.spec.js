@@ -153,3 +153,33 @@ test.describe("Product-owner revisions", () => {
     await expect(page.locator('main a[aria-label*="YouTube"]')).toHaveCount(1);
   });
 });
+
+/* ============================================================
+   Product-owner feedback V1 (July 2026 spreadsheet)
+   ============================================================ */
+test.describe("PO feedback V1 — home", () => {
+  test("home H1 is the SEO title with the strapline below it", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("h1")).toContainText(/blind & visually impaired sports/i);
+    await expect(page.locator("body")).toContainText("Sport without limits. Community without barriers.");
+  });
+
+  test("the three promises use the light rows, not purple-on-purple", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator(".promise-row")).toHaveCount(3);
+    await expect(page.locator(".promise-row").last()).toContainText(/community first/i);
+  });
+
+  test("accessibility button announces itself as screen settings", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await expect(page.locator(".a11y-fab")).toHaveAttribute("aria-label", /screen settings/i);
+  });
+
+  test("about page tells Our Journey with the champions milestone", async ({ page }) => {
+    await page.goto("/about.html");
+    await expect(page.locator("body")).toContainText("Our Journey");
+    await expect(page.locator("body")).toContainText(/champions in our first season/i);
+    await expect(page.locator(".keyline-box")).toHaveCount(2);
+  });
+});

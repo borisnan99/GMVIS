@@ -32,17 +32,17 @@
 
   var fab = document.createElement("button");
   fab.className = "a11y-fab";
-  fab.setAttribute("aria-label", "Open accessibility settings");
+  fab.setAttribute("aria-label", "Open screen settings");
   fab.setAttribute("aria-expanded", "false");
   fab.innerHTML = svg('<circle cx="12" cy="12" r="9"/><path d="M12 8v0M12 11v5M9 12h6"/>');
 
   var panel = document.createElement("div");
   panel.className = "a11y-panel";
   panel.setAttribute("role", "dialog");
-  panel.setAttribute("aria-label", "Accessibility settings");
+  panel.setAttribute("aria-label", "Screen settings");
   panel.setAttribute("data-open", "false");
   panel.innerHTML =
-    '<h2>Accessibility' +
+    '<h2>Screen settings' +
       '<button class="readaloud" style="padding:7px 10px" data-close aria-label="Close settings">' + svg('<path d="M18 6 6 18M6 6l12 12"/>') + '</button>' +
     '</h2>' +
     '<p class="sub">Your choices are saved on this device.</p>' +
