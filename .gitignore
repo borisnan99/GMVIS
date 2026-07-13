@@ -41,5 +41,7 @@ yarn-error.log*
 /test-results/
 
 # Claude Code / project memory
+# (.claude contents are local, EXCEPT skills — those are shared team tooling)
 /.remember/
-/.claude/
+/.claude/*
+!/.claude/skills/

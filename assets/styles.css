@@ -3,36 +3,41 @@
    Black · Gold · Purple. Accessibility-first.
    Body: Atkinson Hyperlegible (designed for low-vision readers)
    Headings: Outfit (geometric — matches the Garet brand wordmark)
-   Brand gold gradient extracted from the Falcons logo: #FFF3A6 -> #F9DF7B -> #B57E10
+   Brand palette V1 (product-owner sign-off, July 2026):
+     Deep Purple #5B2C83 · Gold #C9A227 · Sunshine Yellow #FFD54F
+     Cream #FFFDF5 · Light Grey #F7F7F7 · Charcoal #2F2F2F
+     Dark Navy #1E2A44 · Slate Grey #4A5568
    Dyslexia toggle swaps to Lexend.
    ========================================================================== */
 
 /* ---------- Tokens ---------- */
 :root {
-  --paper:        #FBF8F1;   /* warm cream */
-  --paper-2:      #F3ECDE;   /* slightly deeper cream for panels */
-  --ink:          #1C1430;   /* near-black, purple tinted — body text */
-  --ink-soft:     #4A4060;   /* muted text */
-  --line:         #E2D8C4;   /* hairline on paper */
+  --paper:        #FFFDF5;   /* cream — page background */
+  --paper-2:      #F7F7F7;   /* light grey — alternate sections */
+  --ink:          #2F2F2F;   /* charcoal — body text */
+  --ink-soft:     #4A5568;   /* slate grey — muted text */
+  --line:         #E5E2D8;   /* hairline on paper */
 
   --purple-900:   #160B2A;
   --purple-800:   #20103B;
-  --purple-700:   #341A5E;
-  --purple-600:   #4A2785;
-  --purple-500:   #6A3FB0;
+  --purple-700:   #3A1D63;
+  --purple-600:   #5B2C83;   /* primary deep purple */
+  --purple-500:   #7440A6;
   --purple-300:   #B79BE0;
 
-  --gold-700:     #8A6212;   /* darkened brand gold — AA text on cream */
-  --gold-600:     #B57E10;   /* brand deep gold (logo gradient end) */
-  --gold-500:     #E2B23E;
-  --gold-400:     #F9DF7B;   /* brand mid gold (logo gradient) */
-  --gold-300:     #FFF3A6;   /* brand highlight gold (logo gradient) */
+  --navy:         #1E2A44;   /* brand dark navy */
+
+  --gold-700:     #8A6212;   /* darkened gold — keeps AA for small text on cream */
+  --gold-600:     #B57E10;   /* deep gold (logo gradient end) */
+  --gold-500:     #C9A227;   /* secondary gold */
+  --gold-400:     #FFD54F;   /* sunshine yellow — accent fills */
+  --gold-300:     #FFF3A6;   /* highlight gold — text on dark purple */
 
   --focus:        #F7DC97;   /* focus ring on dark */
-  --focus-dark:   #4A2785;   /* focus ring on light */
+  --focus-dark:   #5B2C83;   /* focus ring on light */
 
-  --link:         #5A2E9C;   /* link on paper, AA on cream */
-  --link-hover:   #341A5E;
+  --link:         #5B2C83;   /* link on paper, AA on cream */
+  --link-hover:   #3A1D63;
 
   --maxw:         1200px;
   --radius:       18px;
@@ -129,7 +134,8 @@ strong { font-weight: 800; }
 
 /* ---------- Layout ---------- */
 .wrap { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: var(--pad); }
-.section { padding-block: clamp(56px, 8vw, 110px); }
+/* Tightened per product-owner feedback: gaps between blocks were too big */
+.section { padding-block: clamp(30px, 4vw, 52px); }
 .eyebrow {
   font-family: var(--font-head); font-weight: 700; font-size: .82rem;
   letter-spacing: .16em; text-transform: uppercase; color: var(--gold-700);
@@ -332,14 +338,18 @@ legend { font-family: var(--font-head); font-weight: 700; padding: 0 10px; font-
 .site-footer { background: var(--purple-900); color: #D9C9F2; padding-block: 60px 30px; }
 [data-contrast="high"] .site-footer { background:#000; border-top: 1px solid #4D4326; }
 .footer-grid { display: grid; gap: 40px; grid-template-columns: 1.4fr repeat(3, 1fr); }
-.site-footer h4 { color: var(--gold-300); font-size: 1rem; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 16px; }
+/* Home carries a fifth (Useful links) column; other pages follow after sign-off */
+.footer-grid.cols-5 { grid-template-columns: 1.3fr repeat(4, 1fr); }
+.site-footer h4 { color: #fff; font-size: 1rem; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 16px; }
 .site-footer a { color: #E6DAF7; text-decoration: none; }
 .site-footer a:hover { color: var(--gold-300); text-decoration: underline; }
 .footer-links { list-style: none; padding: 0; margin: 0; display: grid; gap: 11px; }
 .socials { display: flex; gap: 12px; flex-wrap: wrap; }
-.socials a { width: 46px; height: 46px; border-radius: 12px; border: 1px solid rgba(247,220,151,.3); display: grid; place-items: center; color: var(--gold-300); }
+.socials a { width: 54px; height: 54px; border-radius: 12px; border: 1px solid rgba(247,220,151,.3); display: grid; place-items: center; color: var(--gold-300); }
 .socials a:hover { background: var(--gold-400); color: var(--purple-900); border-color: var(--gold-400); }
-.socials svg { width: 22px; height: 22px; }
+.socials svg { width: 26px; height: 26px; }
+/* Footer socials: larger 2×2 grid (PO feedback) */
+.site-footer .socials { display: grid; grid-template-columns: repeat(2, 54px); gap: 12px; }
 .footer-bottom { border-top: 1px solid rgba(247,220,151,.2); margin-top: 44px; padding-top: 24px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; font-size: .86rem; color: #B79BE0; }
 
 /* ---------- Utilities ---------- */
@@ -394,23 +404,28 @@ legend { font-family: var(--font-head); font-weight: 700; padding: 0 10px; font-
 [data-contrast="high"] .page-reader { background: #000; color: var(--gold-300); }
 @media (max-width: 560px) { .page-reader { padding: 11px 14px; font-size: .88rem; } }
 
-/* ---------- Footer policy links ---------- */
-.footer-policies { display: flex; gap: 12px; flex-wrap: wrap; }
+/* ---------- Footer policy links ----------
+   Home hosts them as a "Useful links" column (ul.footer-links.footer-policies);
+   the flex row applies only to the legacy footer-bottom span on pages not yet
+   migrated to the new footer. */
+.footer-bottom .footer-policies { display: flex; gap: 12px; flex-wrap: wrap; }
 
 /* ---------- Social card (home page) ---------- */
 .social-card { background: linear-gradient(160deg, var(--purple-800), var(--purple-600)); color: #fff; border-radius: var(--radius); padding: clamp(28px, 4vw, 48px); box-shadow: var(--shadow-lg); }
 [data-contrast="high"] .social-card { background: #0B0B0B; border: 1px solid #4D4326; }
 .social-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); margin-top: 26px; }
-.social-link { display: flex; align-items: center; gap: 14px; padding: 16px 18px; background: rgba(255,255,255,.08); border: 1px solid rgba(247,220,151,.25); border-radius: var(--radius-sm); color: #fff; text-decoration: none; font-family: var(--font-head); font-weight: 700; transition: background var(--t), color var(--t), transform var(--t); }
-.social-link:hover { background: var(--gold-400); color: var(--purple-900); border-color: var(--gold-400); transform: translateY(-2px); }
-.social-link svg { width: 28px; height: 28px; flex: none; }
-.social-link .sl-handle { display: block; font-family: var(--font-body); font-weight: 400; font-size: .82rem; opacity: .85; }
-[data-contrast="high"] .social-link { background: #000; border-color: #4D4326; color: #fff; }
-[data-contrast="high"] .social-link:hover { background: var(--gold-400); color: #000; }
+/* Sunshine-yellow tiles with purple symbols (PO: purple-on-purple did not stand out) */
+.social-link { display: flex; align-items: center; gap: 16px; padding: 20px 22px; background: var(--gold-400); border: 2px solid transparent; border-radius: var(--radius-sm); color: var(--purple-800); text-decoration: none; font-family: var(--font-head); font-weight: 700; font-size: 1.05rem; transition: background var(--t), color var(--t), transform var(--t); }
+.social-link:hover { background: var(--gold-300); color: var(--purple-900); transform: translateY(-2px); }
+.social-link svg { width: 36px; height: 36px; flex: none; }
+.social-link .sl-handle { display: block; font-family: var(--font-body); font-weight: 400; font-size: .85rem; }
+[data-contrast="high"] .social-link { background: var(--gold-400); border-color: var(--gold-400); color: #000; }
+[data-contrast="high"] .social-link:hover { background: #000; color: var(--gold-300); }
 
 /* ---------- Footer affiliated organisations ---------- */
 .footer-partners { border-top: 1px solid rgba(247,220,151,.18); margin-top: 30px; padding-top: 24px; }
-.footer-partners .fp-title { display: block; font-family: var(--font-head); font-weight: 700; color: var(--gold-300); font-size: .95rem; margin-bottom: 14px; }
+/* Same treatment as the column headers (PO: match "Explore", caps, white) */
+.footer-partners .fp-title { display: block; font-family: var(--font-head); font-weight: 700; color: #fff; font-size: 1rem; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 16px; }
 .footer-partners ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 12px; }
 .footer-partners a { display: inline-flex; align-items: center; gap: 10px; padding: 7px 16px 7px 7px; border: 1px solid rgba(247,220,151,.28); border-radius: 999px; color: #fff; text-decoration: none; font-family: var(--font-head); font-weight: 700; font-size: .9rem; transition: background var(--t), color var(--t), border-color var(--t); }
 .footer-partners a:hover { background: var(--gold-400); color: var(--purple-900); border-color: var(--gold-400); }
@@ -424,6 +439,61 @@ legend { font-family: var(--font-head); font-weight: 700; padding: 0 10px; font-
 .sponsor-slot { display: grid; place-items: center; min-height: 96px; padding: 16px; border: 2px dashed var(--line); border-radius: var(--radius-sm); color: var(--ink-soft); font-family: var(--font-head); font-weight: 700; font-size: .9rem; text-align: center; background: var(--paper); }
 [data-contrast="high"] .sponsor-slot { background: #000; border-color: #4D4326; color: var(--gold-300); }
 
+/* ---------- Two-tier header (brand + socials above, menu bar below) ---------- */
+.header-socials { display: flex; gap: 8px; align-items: center; }
+.header-socials a { width: 42px; height: 42px; border-radius: 10px; display: grid; place-items: center; color: var(--purple-600); border: 1px solid transparent; transition: background var(--t), color var(--t); }
+.header-socials a:hover { background: var(--gold-400); color: var(--purple-900); }
+.header-socials svg { width: 22px; height: 22px; }
+[data-contrast="high"] .header-socials a { color: var(--gold-400); }
+[data-contrast="high"] .header-socials a:hover { background: var(--gold-400); color: #000; }
+.menu-bar { border-top: 1px solid var(--line); }
+.menu-bar .menu { min-height: 52px; flex-wrap: wrap; }
+
+/* ---------- Photo activity cards (Find your sport) ---------- */
+.card-photo { padding: 0; overflow: hidden; }
+.card-photo .card-media { height: 180px; border-radius: 0; }
+.card-photo .card-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.card-photo .card-media.ph { min-height: 180px; border: 0; border-bottom: 1px solid var(--line); }
+.card-photo .card-body { padding: 24px 28px 28px; display: flex; flex-direction: column; flex: 1; }
+[data-contrast="high"] .card-photo .card-media.ph { border-bottom-color: #4D4326; }
+
+/* ---------- Promise rows (What we stand for) ---------- */
+.promise-row {
+  display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: start;
+  background: #fff; border: 1px solid var(--line); border-left: 6px solid var(--purple-600);
+  border-radius: var(--radius); padding: 26px 30px; box-shadow: var(--shadow);
+}
+.promise-row + .promise-row { margin-top: 18px; }
+/* .ic sizing lives on .card .ic — restate it here since these rows aren't cards */
+.promise-row .ic { width: 54px; height: 54px; border-radius: 14px; display: grid; place-items: center; margin-bottom: 0; background: var(--gold-400); color: var(--purple-800); }
+.promise-row .ic svg { width: 28px; height: 28px; }
+.promise-row h3 { color: var(--purple-600); margin-bottom: 6px; }
+.promise-row p { margin: 0; color: var(--ink); max-width: 75ch; }
+[data-contrast="high"] .promise-row { background: #0B0B0B; border-color: #4D4326; border-left-color: var(--gold-400); }
+[data-contrast="high"] .promise-row h3 { color: var(--gold-400); }
+[data-contrast="high"] .promise-row .ic { background: #1a1a1a; color: var(--gold-400); }
+@media (max-width: 560px) { .promise-row { grid-template-columns: 1fr; } }
+
+/* ---------- Keyline box (mission/vision — PO: frame in a purple keyline) ---------- */
+.keyline-box {
+  background: #fff; border: 2px solid var(--purple-600);
+  border-radius: var(--radius); padding: 26px 30px; box-shadow: var(--shadow);
+}
+[data-contrast="high"] .keyline-box { background: #0B0B0B; border-color: var(--gold-400); }
+
+/* ---------- "Screen settings" tooltip on the accessibility button ---------- */
+.a11y-fab::after {
+  content: "Screen settings";
+  position: absolute; right: calc(100% + 12px); top: 50%;
+  transform: translateY(-50%) scale(.96);
+  background: var(--purple-800); color: #fff;
+  font-family: var(--font-head); font-weight: 700; font-size: .88rem;
+  padding: 8px 14px; border-radius: 999px; white-space: nowrap; box-shadow: var(--shadow);
+  opacity: 0; pointer-events: none; transition: opacity var(--t), transform var(--t);
+}
+.a11y-fab:hover::after, .a11y-fab:focus-visible::after { opacity: 1; transform: translateY(-50%) scale(1); }
+[data-contrast="high"] .a11y-fab::after { background: #000; color: var(--gold-300); border: 1px solid #4D4326; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1040px) {
   .hamburger { display: inline-flex; }
@@ -436,11 +506,16 @@ legend { font-family: var(--font-head); font-weight: 700; padding: 0 10px; font-
   .menu[data-open="true"] { transform: none; }
   .menu a { padding: 14px; font-size: 1.1rem; }
   .nav .btn.nav-cta { display: none; }
+  /* .menu goes position:fixed here, so the bar collapses — just drop its border.
+     Never display:none it: the #menu dropdown lives inside. */
+  .menu-bar { border-top: 0; }
+  .menu-bar .menu { min-height: 0; }
+  .header-socials { display: none; }
 }
 @media (max-width: 900px) {
-  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .footer-grid, .footer-grid.cols-5 { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 620px) {
-  .footer-grid { grid-template-columns: 1fr; }
+  .footer-grid, .footer-grid.cols-5 { grid-template-columns: 1fr; }
   .brand .name span { display: none; }
 }
