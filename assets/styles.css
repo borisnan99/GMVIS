@@ -144,10 +144,11 @@ strong { font-weight: 800; }
 [data-contrast="high"] .eyebrow { color: var(--gold-400); }
 .eyebrow::before { content: ""; width: 30px; height: 3px; background: var(--gold-500); border-radius: 2px; }
 
-h1.display { font-size: clamp(2.6rem, 6.2vw, 5rem); }
-h2.h2 { font-size: clamp(2rem, 4vw, 3.2rem); }
-h3.h3 { font-size: clamp(1.35rem, 2vw, 1.7rem); }
-.lede { font-size: calc(clamp(1.15rem, 1.6vw, 1.4rem) * var(--fs-scale)); color: var(--ink-soft); max-width: 60ch; }
+/* Scale reduced across the board per client V2 feedback ("all headers too big") */
+h1.display { font-size: clamp(2.1rem, 4.6vw, 3.4rem); }
+h2.h2 { font-size: clamp(1.65rem, 3vw, 2.4rem); }
+h3.h3 { font-size: clamp(1.25rem, 1.8vw, 1.5rem); }
+.lede { font-size: calc(clamp(1.05rem, 1.4vw, 1.25rem) * var(--fs-scale)); color: var(--ink-soft); max-width: 60ch; }
 [data-contrast="high"] .lede { color: var(--ink); }
 
 /* ---------- Header ---------- */
@@ -181,8 +182,8 @@ h3.h3 { font-size: clamp(1.35rem, 2vw, 1.7rem); }
   --bg: var(--purple-600); --fg: #fff;
   display: inline-flex; align-items: center; gap: 10px; justify-content: center;
   background: var(--bg); color: var(--fg);
-  font-family: var(--font-head); font-weight: 700; font-size: 1rem;
-  padding: 14px 24px; border-radius: 999px; border: 2px solid transparent;
+  font-family: var(--font-head); font-weight: 700; font-size: .95rem;
+  padding: 11px 20px; border-radius: 999px; border: 2px solid transparent;
   text-decoration: none; cursor: pointer; transition: transform var(--t), box-shadow var(--t), background var(--t);
   box-shadow: var(--shadow); white-space: nowrap;
 }
@@ -190,7 +191,7 @@ h3.h3 { font-size: clamp(1.35rem, 2vw, 1.7rem); }
 .btn.gold { --bg: linear-gradient(135deg, var(--gold-500), var(--gold-300)); --fg: #2A1A05; }
 .btn.ghost { --bg: transparent; --fg: var(--ink); border-color: var(--ink); box-shadow: none; }
 .btn.ghost:hover { --bg: var(--ink); --fg: var(--paper); }
-.btn.lg { font-size: 1.08rem; padding: 17px 30px; }
+.btn.lg { font-size: 1rem; padding: 13px 24px; }
 [data-contrast="high"] .btn { box-shadow: 0 0 0 2px #6A581F; }
 
 /* Hamburger (mobile) */
@@ -345,11 +346,15 @@ legend { font-family: var(--font-head); font-weight: 700; padding: 0 10px; font-
 .site-footer a:hover { color: var(--gold-300); text-decoration: underline; }
 .footer-links { list-style: none; padding: 0; margin: 0; display: grid; gap: 11px; }
 .socials { display: flex; gap: 12px; flex-wrap: wrap; }
-.socials a { width: 54px; height: 54px; border-radius: 12px; border: 1px solid rgba(247,220,151,.3); display: grid; place-items: center; color: var(--gold-300); }
+.socials a { width: 58px; height: 58px; border-radius: 50%; border: 1px solid rgba(247,220,151,.3); display: grid; place-items: center; color: var(--gold-300); }
 .socials a:hover { background: var(--gold-400); color: var(--purple-900); border-color: var(--gold-400); }
 .socials svg { width: 26px; height: 26px; }
-/* Footer socials: larger 2×2 grid (PO feedback) */
-.site-footer .socials { display: grid; grid-template-columns: repeat(2, 54px); gap: 12px; }
+/* Footer socials: circles in a 2×2 quadrant (client V2) */
+.site-footer .socials { display: grid; grid-template-columns: repeat(2, 58px); gap: 12px; }
+/* Brand column: contact details sit under the logo; keep the logo's top
+   optically level with the caps column headers */
+.site-footer .brand { margin-top: -4px; }
+.site-footer .brand .mark { height: 42px; }
 .footer-bottom { border-top: 1px solid rgba(247,220,151,.2); margin-top: 44px; padding-top: 24px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; font-size: .86rem; color: #B79BE0; }
 
 /* ---------- Utilities ---------- */
@@ -413,12 +418,12 @@ legend { font-family: var(--font-head); font-weight: 700; padding: 0 10px; font-
 /* ---------- Social card (home page) ---------- */
 .social-card { background: linear-gradient(160deg, var(--purple-800), var(--purple-600)); color: #fff; border-radius: var(--radius); padding: clamp(28px, 4vw, 48px); box-shadow: var(--shadow-lg); }
 [data-contrast="high"] .social-card { background: #0B0B0B; border: 1px solid #4D4326; }
-.social-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); margin-top: 26px; }
-/* Sunshine-yellow tiles with purple symbols (PO: purple-on-purple did not stand out) */
-.social-link { display: flex; align-items: center; gap: 16px; padding: 20px 22px; background: var(--gold-400); border: 2px solid transparent; border-radius: var(--radius-sm); color: var(--purple-800); text-decoration: none; font-family: var(--font-head); font-weight: 700; font-size: 1.05rem; transition: background var(--t), color var(--t), transform var(--t); }
+/* Purple glyphs in sunshine-yellow circles, left-aligned row (client V2:
+   "don't need big yellow blocks") */
+.social-grid { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 24px; }
+.social-link { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; background: var(--gold-400); border: 2px solid transparent; color: var(--purple-800); text-decoration: none; transition: background var(--t), color var(--t), transform var(--t); }
 .social-link:hover { background: var(--gold-300); color: var(--purple-900); transform: translateY(-2px); }
-.social-link svg { width: 36px; height: 36px; flex: none; }
-.social-link .sl-handle { display: block; font-family: var(--font-body); font-weight: 400; font-size: .85rem; }
+.social-link svg { width: 28px; height: 28px; flex: none; }
 [data-contrast="high"] .social-link { background: var(--gold-400); border-color: var(--gold-400); color: #000; }
 [data-contrast="high"] .social-link:hover { background: #000; color: var(--gold-300); }
 
@@ -440,20 +445,24 @@ legend { font-family: var(--font-head); font-weight: 700; padding: 0 10px; font-
 [data-contrast="high"] .sponsor-slot { background: #000; border-color: #4D4326; color: var(--gold-300); }
 
 /* ---------- Two-tier header (brand + socials above, menu bar below) ---------- */
-.header-socials { display: flex; gap: 8px; align-items: center; }
-.header-socials a { width: 42px; height: 42px; border-radius: 10px; display: grid; place-items: center; color: var(--purple-600); border: 1px solid transparent; transition: background var(--t), color var(--t); }
+/* Filled circles with white glyphs: equal optical weight across networks
+   (client: the bare YouTube glyph looked wrong next to the outline icons) */
+.header-socials { display: flex; gap: 6px; align-items: center; }
+.header-socials a { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--purple-600); color: #fff; transition: background var(--t), color var(--t); }
 .header-socials a:hover { background: var(--gold-400); color: var(--purple-900); }
-.header-socials svg { width: 22px; height: 22px; }
-[data-contrast="high"] .header-socials a { color: var(--gold-400); }
-[data-contrast="high"] .header-socials a:hover { background: var(--gold-400); color: #000; }
+.header-socials svg { width: 18px; height: 18px; }
+[data-contrast="high"] .header-socials a { background: var(--gold-400); color: #000; }
+[data-contrast="high"] .header-socials a:hover { background: #fff; }
 .menu-bar { border-top: 1px solid var(--line); }
 .menu-bar .menu { min-height: 52px; flex-wrap: wrap; }
 
 /* ---------- Photo activity cards (Find your sport) ---------- */
 .card-photo { padding: 0; overflow: hidden; }
-.card-photo .card-media { height: 180px; border-radius: 0; }
+/* height AND min-height pinned so .ph's base min-height can't skew one card
+   (client: "image same size for all 3 — standardise") */
+.card-photo .card-media { height: 180px; min-height: 0; border-radius: 0; }
 .card-photo .card-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.card-photo .card-media.ph { min-height: 180px; border: 0; border-bottom: 1px solid var(--line); }
+.card-photo .card-media.ph { border: 0; border-bottom: 1px solid var(--line); }
 .card-photo .card-body { padding: 24px 28px 28px; display: flex; flex-direction: column; flex: 1; }
 [data-contrast="high"] .card-photo .card-media.ph { border-bottom-color: #4D4326; }
 

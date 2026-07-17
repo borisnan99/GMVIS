@@ -146,6 +146,7 @@ test.describe("Product-owner revisions", () => {
     await expect(page.locator("body")).toContainText("Est. 2024");
     await expect(page.locator("body")).not.toContainText("Est. 2019");
     await expect(page.locator("#vol-h")).toBeVisible();
+    await expect(page.locator("#vol-h")).toHaveText("Powered by volunteers");
   });
 
   test("activities page links to YouTube", async ({ page }) => {
