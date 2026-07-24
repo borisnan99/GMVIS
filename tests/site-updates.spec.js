@@ -184,3 +184,58 @@ test.describe("PO feedback V1 — home", () => {
     await expect(page.locator(".keyline-box")).toHaveCount(2);
   });
 });
+
+/* ============================================================
+   Product-owner feedback V2 (July 2026 spreadsheets)
+   ============================================================ */
+test.describe("PO feedback V2 — shared chrome carried across every page", () => {
+  // The V2 header (social icons + a dedicated menu bar) and footer ("Stay in
+  // touch" social quadrant, 5 columns, contact under the logo) were signed off
+  // on the home page and must be identical on all public pages — see M1.
+  test("every public page uses the home header (menu bar + header social icons)", async ({ page }) => {
+    for (const path of PUBLIC_PAGES) {
+      await page.goto(path);
+      await expect(page.locator(".menu-bar #menu"), `${path} menu bar`).toHaveCount(1);
+      await expect(page.locator(".header-socials"), `${path} header socials`).toHaveCount(1);
+    }
+  });
+
+  test("every public page uses the home footer (5-col grid + 'Stay in touch' socials)", async ({ page }) => {
+    for (const path of PUBLIC_PAGES) {
+      await page.goto(path);
+      await expect(page.locator(".site-footer .footer-grid.cols-5"), `${path} footer grid`).toHaveCount(1);
+      await expect(page.locator(".site-footer")).toContainText("Stay in touch");
+      await expect(page.locator(".site-footer .socials a[aria-label='Facebook']")).toHaveCount(1);
+    }
+  });
+
+  test("the old 'disc' Facebook icon is gone everywhere (now a plain 'f')", async ({ page }) => {
+    // The client asked for the Facebook mark to be a white 'f' inside the circle,
+    // not the old disc-with-cut-out glyph. Lock the old path out site-wide.
+    for (const path of PUBLIC_PAGES) {
+      const res = await page.request.get(path);
+      const html = await res.text();
+      expect(html, `${path} still ships the old Facebook disc path`).not.toContain("M22 12a10 10 0 1 0-11.6 9.9");
+    }
+  });
+});
+
+test.describe("PO feedback V2 — About & Activities content", () => {
+  test("about 'Mission & vision' block gains a 'Why we exist' heading and 'Our purpose'", async ({ page }) => {
+    await page.goto("/about.html");
+    await expect(page.locator("body")).toContainText("Why we exist");
+    await expect(page.locator(".keyline-box").first()).toContainText("Our purpose");
+    await expect(page.locator("body")).not.toContainText("Our mission");
+  });
+
+  test("about 'meet the teams' uses the new heading and volunteer-led copy", async ({ page }) => {
+    await page.goto("/about.html");
+    await expect(page.locator("body")).toContainText("The people who power our sports");
+    await expect(page.locator("body")).not.toContainText("The people behind each sport");
+  });
+
+  test("activities 'Watch us on YouTube' button uses the gold style", async ({ page }) => {
+    await page.goto("/activities.html");
+    await expect(page.locator('main a[aria-label*="YouTube"]')).toHaveClass(/\bgold\b/);
+  });
+});
