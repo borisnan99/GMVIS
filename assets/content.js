@@ -63,10 +63,22 @@
     });
   }
 
+  /* Category → chip modifier class. Slugified so admin categories map to the
+     colour-coded .cat-* palette in styles.css; unknown categories fall back
+     to the default purple chip. (PO V1 26.07: categories must stand out.) */
+  function catClass(category) {
+    return "cat cat-" + String(category).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  }
+
   function renderBlogCard(p) {
     var card = el("article", "card");
     card.style.padding = "0";
     card.style.overflow = "hidden";
+    card.style.position = "relative";
+
+    var chip = el("span", catClass(p.category) + " on-media");
+    chip.textContent = p.category;
+    card.appendChild(chip);
 
     if (p.coverUrl) {
       var img = document.createElement("img");
@@ -81,15 +93,17 @@
     }
 
     var inner = el("div"); inner.style.padding = "24px";
-    var tag = el("span", "tag"); tag.textContent = p.category; inner.appendChild(tag);
+    var tag = el("span", "tag"); tag.textContent = formatDate(p.createdAt); inner.appendChild(tag);
     var h = el("h3", "h3"); h.style.cssText = "font-size:1.22rem; margin:8px 0 10px"; h.textContent = p.title; inner.appendChild(h);
     if (p.excerpt) {
       var ex = el("p"); ex.style.cssText = "color:var(--ink-soft); font-size:.96rem"; ex.textContent = p.excerpt; inner.appendChild(ex);
     }
-    var meta = el("p");
-    meta.style.cssText = "font-family:var(--font-head); font-weight:700; font-size:.85rem; color:var(--purple-600); margin:12px 0 0";
-    meta.textContent = (p.author ? p.author + " · " : "") + formatDate(p.createdAt);
-    inner.appendChild(meta);
+    if (p.author) {
+      var meta = el("p");
+      meta.style.cssText = "font-family:var(--font-head); font-weight:700; font-size:.85rem; color:var(--purple-600); margin:12px 0 0";
+      meta.textContent = "By " + p.author;
+      inner.appendChild(meta);
+    }
 
     if (p.body && p.body.trim()) {
       var det = document.createElement("details"); det.style.marginTop = "12px";

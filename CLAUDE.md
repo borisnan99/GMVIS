@@ -42,7 +42,7 @@ drift — trust code and tests over it, and update it when structure changes).
 
 | Surface | Files |
 |---|---|
-| Public pages (12, share chrome) | `index about activities news blog gallery get-involved contact complaints safeguarding constitution 404`.html |
+| Public pages (13, share chrome) | `index about activities news news-article blog gallery get-involved contact complaints safeguarding constitution 404`.html |
 | Admin portal (separate template: no footer/menu, noindex) | `admin.html`, `assets/admin.js`, `assets/admin.css` |
 | Design system + themes | `assets/styles.css` |
 | Shared behavior (a11y toolbar, nav, read-aloud, Web3Forms submit) | `assets/app.js` |
@@ -113,7 +113,7 @@ drift — trust code and tests over it, and update it when structure changes).
 
 **M1 — The one-page nav edit.** You change the header/footer on the page you
 were asked about; the other 11 copies now disagree.
-*Rule: any change to shared chrome is applied to all 12 public pages, then
+*Rule: any change to shared chrome is applied to all 13 public pages, then
 verified with `grep -l '<the change>' *.html | wc -l`. `404.html` needs the
 root-relative (`/path`) variant.*
 
@@ -194,7 +194,7 @@ Adding any dependency is a user decision; propose, don't install.*
 
 **Any HTML/content change**
 - [ ] `npm test` fully green (accessibility, navigation, site-updates at minimum)
-- [ ] Shared-chrome edits present in all 12 pages (grep count verified); 404 variant root-relative
+- [ ] Shared-chrome edits present in all 13 pages (grep count verified); 404 variant root-relative
 - [ ] No banned wording introduced (M5 list)
 - [ ] Exactly one `<h1>`; heading levels don't skip; unique `<title>` + meta description
 - [ ] New images: real alt text, or `alt="" aria-hidden="true"` if decorative

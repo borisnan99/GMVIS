@@ -1,6 +1,6 @@
 ---
 name: site-content
-description: Make content, copy, nav/footer, or page-structure changes across the GMVIS static site — including product-owner revision batches and adding a whole new page. Use for any edit to the root *.html files or site copy. Encodes the no-templating fan-out (a chrome change = 12 files), the wording invariants, and the regression-test requirement.
+description: Make content, copy, nav/footer, or page-structure changes across the GMVIS static site — including product-owner revision batches and adding a whole new page. Use for any edit to the root *.html files or site copy. Encodes the no-templating fan-out (a chrome change = 13 files), the wording invariants, and the regression-test requirement.
 ---
 
 # Editing GMVIS site content
@@ -12,7 +12,8 @@ with a regression test so it can't silently drift back.
 
 ## The page inventory (know your fan-out)
 
-12 public pages share the chrome: `index`, `about`, `activities`, `news`,
+13 public pages share the chrome: `index`, `about`, `activities`, `news`,
+`news-article`,
 `blog`, `gallery`, `get-involved`, `contact`, `complaints`, `safeguarding`,
 `constitution`, `404` (all `.html`, repo root). Two special cases:
 
@@ -28,9 +29,9 @@ Fan-out cheat sheet:
 
 | Change | Files to edit |
 |---|---|
-| Header nav menu (8 links + "Join in" CTA) | 12 files |
-| Footer (Explore / Get involved / Contact columns, partners strip, policies row) | 12 files |
-| Head boilerplate (fonts, meta) | 13 files (incl. admin) |
+| Header nav menu (8 links + "Join in" CTA) | 13 files |
+| Footer (Explore / Get involved / Contact columns, partners strip, policies row) | 13 files |
+| Head boilerplate (fonts, meta) | 14 files (incl. admin) |
 | Copy on one page | that page — then grep, the same phrase often exists on `index.html` teasers and in the footer |
 
 After any fan-out edit, verify mechanically — count must equal the
@@ -107,7 +108,7 @@ Copy the pattern from an existing page; don't invent variants:
 3. Hero read-aloud block: `.readaloud` button with
    `data-readaloud="#xxx-read"` + the matching
    `<p id="xxx-read" class="visually-hidden" data-read-text="…">`.
-4. Decide navigation: primary menu (edit the menu in **all 12 pages**,
+4. Decide navigation: primary menu (edit the menu in **all 13 pages**,
    and give the new page's own menu entry `aria-current="page"`) or
    footer-only (like safeguarding/constitution — no `aria-current`
    anywhere).

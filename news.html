@@ -51,9 +51,9 @@
   <div class="wrap">
     <p class="eyebrow" style="color:var(--gold-300)">Latest</p>
     <h1 class="display" style="color:#fff; max-width:18ch">News &amp; events</h1>
-    <p class="lede" style="color:#E2D2F7; margin-top:18px; max-width:62ch">Match reports, club updates and everything coming up in the diary — so you never miss a session, a fixture or a social.</p>
+    <p class="lede" style="color:#E2D2F7; margin-top:18px; max-width:62ch">Match reports, club news and upcoming events — so you never miss a session, fixture or social.</p>
     <button class="readaloud" data-readaloud="#news-read" data-label-default="Listen" aria-label="Listen to this page introduction" style="background:rgba(255,255,255,.08); border-color:rgba(247,220,151,.4); color:var(--gold-300); margin-top:26px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4l14 8-14 8V4z"/></svg><span class="ra-label">Listen</span></button>
-    <p id="news-read" class="visually-hidden" data-read-text="Welcome to our news and events page. Here you will find the latest club updates, match reports and a calendar of everything coming up. Highlights this season include the start of our summer cricket fixtures, regular goalball come-and-try sessions, monthly guided walks, and our summer social and quiz night. Scroll down for the full list, or sign up to our newsletter to get updates by email."></p>
+    <p id="news-read" class="visually-hidden" data-read-text="Welcome to our news and events page. Here you will find match reports, club news and upcoming events. Highlights this season include the start of our summer cricket fixtures, regular goalball come-and-try sessions, monthly guided walks, and our summer social and quiz night. Scroll down for the full list, or sign up to our newsletter to get updates by email."></p>
   </div>
 </section>
 <section class="section">
@@ -86,7 +86,38 @@
   <div class="wrap">
     <p class="eyebrow">Recent news</p>
     <h2 class="h2" style="margin-bottom:32px">From the club</h2>
-    <div class="cards"><a class="card" href="#" style="padding:0; overflow:hidden"><img src="assets/team-photo.jpg" alt="Falcons team members in purple kit." style="width:100%; height:190px; object-fit:cover"><div style="padding:24px"><span class="tag">12 May 2026 · Cricket</span><h3 class="h3" style="font-size:1.2rem; margin:8px 0">Summer cricket season kicks off at Sale</h3><p style="color:var(--ink-soft); font-size:.96rem">Our VI cricket team returns to the field for a packed summer of fixtures. Whether you want to play or simply watch, everyone is welcome at Sale Cricket Club.</p><span class="more">Read more <span aria-hidden="true">→</span></span></div></a><a class="card" href="#" style="padding:0; overflow:hidden"><div class="ph" aria-hidden="true" data-label="News image" style="border-radius:0; min-height:170px"></div><div style="padding:24px"><span class="tag">28 Apr 2026 · Goalball</span><h3 class="h3" style="font-size:1.2rem; margin:8px 0">Falcons place third at regional goalball cup</h3><p style="color:var(--ink-soft); font-size:.96rem">A brilliant weekend of fast, physical goalball saw our squad battle through to a well-earned podium finish at the North West regional cup.</p><span class="more">Read more <span aria-hidden="true">→</span></span></div></a><a class="card" href="#" style="padding:0; overflow:hidden"><div class="ph" aria-hidden="true" data-label="News image" style="border-radius:0; min-height:170px"></div><div style="padding:24px"><span class="tag">15 Apr 2026 · Social</span><h3 class="h3" style="font-size:1.2rem; margin:8px 0">Monthly coffee morning moves to a new city-centre venue</h3><p style="color:var(--ink-soft); font-size:.96rem">Our popular coffee mornings have a bright new accessible home. Same warm welcome, easier to reach by tram and bus.</p><span class="more">Read more <span aria-hidden="true">→</span></span></div></a><a class="card" href="#" style="padding:0; overflow:hidden"><div class="ph" aria-hidden="true" data-label="News image" style="border-radius:0; min-height:170px"></div><div style="padding:24px"><span class="tag">02 Apr 2026 · Club</span><h3 class="h3" style="font-size:1.2rem; margin:8px 0">New guides complete sighted-guiding training</h3><p style="color:var(--ink-soft); font-size:.96rem">Twelve brilliant volunteers have completed accredited sighted-guiding training, meaning even more support at every session.</p><span class="more">Read more <span aria-hidden="true">→</span></span></div></a><a class="card" href="#" style="padding:0; overflow:hidden"><div class="ph" aria-hidden="true" data-label="News image" style="border-radius:0; min-height:170px"></div><div style="padding:24px"><span class="tag">18 Mar 2026 · Football</span><h3 class="h3" style="font-size:1.2rem; margin:8px 0">Wednesday football moves outdoors for spring</h3><p style="color:var(--ink-soft); font-size:.96rem">With lighter evenings here, our football sessions return to the 3G pitch in Trafford. New players always welcome.</p><span class="more">Read more <span aria-hidden="true">→</span></span></div></a><a class="card" href="#" style="padding:0; overflow:hidden"><div class="ph" aria-hidden="true" data-label="News image" style="border-radius:0; min-height:170px"></div><div style="padding:24px"><span class="tag">05 Mar 2026 · Walks</span><h3 class="h3" style="font-size:1.2rem; margin:8px 0">Spring walks programme announced</h3><p style="color:var(--ink-soft); font-size:.96rem">Six months of guided walks through Greater Manchester's loveliest green spaces — see the full schedule and sign up.</p><span class="more">Read more <span aria-hidden="true">→</span></span></div></a>    </div>
+    <div class="cards">
+      <a class="card" href="news-article.html?a=cricket-season-2026" style="padding:0; overflow:hidden; position:relative">
+        <span class="cat cat-cricket on-media">Cricket</span>
+        <img src="assets/team-photo.jpg" alt="Falcons team members in purple kit." style="width:100%; height:190px; object-fit:cover">
+        <div style="padding:24px"><span class="tag">12 May 2026</span><h3 class="h3" style="font-size:1.2rem; margin:8px 0">Summer cricket season kicks off at Sale</h3><p style="color:var(--ink-soft); font-size:.96rem">Our VI cricket team returns to the field for a packed summer of fixtures. Whether you want to play or simply watch, everyone is welcome at Sale Cricket Club.</p><span class="more">Read more <span aria-hidden="true">→</span></span></div>
+      </a>
+      <a class="card" href="news-article.html?a=goalball-cup-2026" style="padding:0; overflow:hidden; position:relative">
+        <span class="cat cat-goalball on-media">Goalball</span>
+        <div class="ph" aria-hidden="true" data-label="News image" style="border-radius:0; min-height:170px"></div>
+        <div style="padding:24px"><span class="tag">28 Apr 2026</span><h3 class="h3" style="font-size:1.2rem; margin:8px 0">Falcons place third at regional goalball cup</h3><p style="color:var(--ink-soft); font-size:.96rem">A brilliant weekend of fast, physical goalball saw our squad battle through to a well-earned podium finish at the North West regional cup.</p><span class="more">Read more <span aria-hidden="true">→</span></span></div>
+      </a>
+      <a class="card" href="news-article.html?a=coffee-morning-new-venue" style="padding:0; overflow:hidden; position:relative">
+        <span class="cat cat-social on-media">Social</span>
+        <div class="ph" aria-hidden="true" data-label="News image" style="border-radius:0; min-height:170px"></div>
+        <div style="padding:24px"><span class="tag">15 Apr 2026</span><h3 class="h3" style="font-size:1.2rem; margin:8px 0">Monthly coffee morning moves to a new city-centre venue</h3><p style="color:var(--ink-soft); font-size:.96rem">Our popular coffee mornings have a bright new accessible home. Same warm welcome, easier to reach by tram and bus.</p><span class="more">Read more <span aria-hidden="true">→</span></span></div>
+      </a>
+      <a class="card" href="news-article.html?a=sighted-guiding-training" style="padding:0; overflow:hidden; position:relative">
+        <span class="cat cat-club on-media">Club</span>
+        <div class="ph" aria-hidden="true" data-label="News image" style="border-radius:0; min-height:170px"></div>
+        <div style="padding:24px"><span class="tag">02 Apr 2026</span><h3 class="h3" style="font-size:1.2rem; margin:8px 0">New guides complete sighted-guiding training</h3><p style="color:var(--ink-soft); font-size:.96rem">Twelve brilliant volunteers have completed accredited sighted-guiding training, meaning even more support at every session.</p><span class="more">Read more <span aria-hidden="true">→</span></span></div>
+      </a>
+      <a class="card" href="news-article.html?a=football-outdoors-spring" style="padding:0; overflow:hidden; position:relative">
+        <span class="cat cat-football on-media">Football</span>
+        <div class="ph" aria-hidden="true" data-label="News image" style="border-radius:0; min-height:170px"></div>
+        <div style="padding:24px"><span class="tag">18 Mar 2026</span><h3 class="h3" style="font-size:1.2rem; margin:8px 0">Wednesday football moves outdoors for spring</h3><p style="color:var(--ink-soft); font-size:.96rem">With lighter evenings here, our football sessions return to the 3G pitch in Trafford. New players always welcome.</p><span class="more">Read more <span aria-hidden="true">→</span></span></div>
+      </a>
+      <a class="card" href="news-article.html?a=spring-walks-2026" style="padding:0; overflow:hidden; position:relative">
+        <span class="cat cat-walks on-media">Walks</span>
+        <div class="ph" aria-hidden="true" data-label="News image" style="border-radius:0; min-height:170px"></div>
+        <div style="padding:24px"><span class="tag">05 Mar 2026</span><h3 class="h3" style="font-size:1.2rem; margin:8px 0">Spring walks programme announced</h3><p style="color:var(--ink-soft); font-size:.96rem">Six months of guided walks through Greater Manchester's loveliest green spaces — see the full schedule and sign up.</p><span class="more">Read more <span aria-hidden="true">→</span></span></div>
+      </a>
+    </div>
   </div>
 </section>
 <section class="section band">

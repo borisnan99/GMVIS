@@ -55,6 +55,7 @@ The project has two parts:
 ├── about.html                 About / who we are
 ├── activities.html            Activities (VI cricket, goalball, football, …)
 ├── news.html                  News & events (semantic <time> event list)
+├── news-article.html          News detail template (static articles keyed by ?a=slug)
 ├── blog.html                  Blog — renders posts dynamically from the API
 ├── gallery.html               Media gallery — images/videos from the API
 ├── get-involved.html          Membership / volunteering
