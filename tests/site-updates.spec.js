@@ -132,7 +132,8 @@ test.describe("Product-owner revisions", () => {
     await page.goto("/contact.html");
     await expect(page.locator('input[name="c-sports"]').first()).toBeAttached();
     await expect(page.locator('input[name="c-experience"]').first()).toBeAttached();
-    await expect(page.locator('input[name="c-occupation"]').first()).toBeAttached();
+    // "What do you do?" block removed per PO final amends 26.07 ("keep it simple")
+    await expect(page.locator('input[name="c-occupation"]')).toHaveCount(0);
   });
 
   test("football is presented as coming soon and cricket is at Astley Bridge", async ({ page }) => {
@@ -305,5 +306,48 @@ test.describe("PO feedback — news, blog, get involved (July 2026)", () => {
     await page.goto("/blog.html");
     const card = page.locator(".card", { hasText: title });
     await expect(card.locator(".cat.cat-tips")).toBeVisible();
+  });
+});
+
+/* ============================================================
+   Product-owner final amends (26.07.26 "GMVIZ final amends")
+   ============================================================ */
+test.describe("PO final amends — get involved, news detail, contact", () => {
+  test("get-involved opens with 'Join our community' and the volunteer intro", async ({ page }) => {
+    await page.goto("/get-involved.html");
+    await expect(page.locator("#join-h")).toHaveText("Join our community");
+    await expect(page.locator("body")).toContainText("every contribution makes a difference");
+    await expect(page.locator("body")).toContainText("you'll make a lasting impact");
+  });
+
+  test("news list can filter by category", async ({ page }) => {
+    await page.goto("/news.html");
+    const pills = page.locator('[aria-label="Filter news by category"] button');
+    await expect(pills).toHaveCount(7);
+    await pills.filter({ hasText: "Cricket" }).click();
+    await expect(page.locator("#news-cards > a:visible")).toHaveCount(1);
+    await pills.filter({ hasText: "All news" }).click();
+    await expect(page.locator("#news-cards > a:visible")).toHaveCount(6);
+  });
+
+  test("news article has 'The full story' header and three related stories", async ({ page }) => {
+    await page.goto("/news-article.html?a=spring-walks-2026");
+    await expect(page.locator("main")).toContainText("The full story");
+    await expect(page.locator("#rel-h")).toHaveText("Related stories");
+    const related = page.locator("#art-related > a.card");
+    await expect(related).toHaveCount(3);
+    // never relates to itself
+    await expect(page.locator('#art-related a[href*="spring-walks-2026"]')).toHaveCount(0);
+  });
+
+  test("contact page reads 'Get in touch' with the simplified form", async ({ page }) => {
+    await page.goto("/contact.html");
+    await expect(page.locator("main")).toContainText("Get in touch");
+    await expect(page.locator("body")).not.toContainText("General enquiry");
+    await expect(page.locator("body")).not.toContainText("Reach us directly");
+    await expect(page.locator("legend", { hasText: "Contact preference" })).toBeAttached();
+    const chipBg = await page.locator(".radio-chip").first()
+      .evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(chipBg).not.toBe("rgba(0, 0, 0, 0)"); // pale yellow fill, not transparent
   });
 });

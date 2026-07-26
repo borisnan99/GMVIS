@@ -85,8 +85,17 @@
 <section class="section" style="background:var(--paper-2)">
   <div class="wrap">
     <p class="eyebrow">Recent news</p>
-    <h2 class="h2" style="margin-bottom:32px">From the club</h2>
-    <div class="cards">
+    <h2 class="h2" style="margin-bottom:18px">From the club</h2>
+    <div class="pills" role="group" aria-label="Filter news by category" style="margin-bottom:32px">
+      <button type="button" class="pill" aria-pressed="true" style="background:var(--purple-600); color:#fff; border:none; cursor:pointer; font-family:inherit; font-size:inherit">All news</button>
+      <button type="button" class="pill" aria-pressed="false" style="border:none; cursor:pointer; font-family:inherit; font-size:inherit">Cricket</button>
+      <button type="button" class="pill" aria-pressed="false" style="border:none; cursor:pointer; font-family:inherit; font-size:inherit">Goalball</button>
+      <button type="button" class="pill" aria-pressed="false" style="border:none; cursor:pointer; font-family:inherit; font-size:inherit">Social</button>
+      <button type="button" class="pill" aria-pressed="false" style="border:none; cursor:pointer; font-family:inherit; font-size:inherit">Club</button>
+      <button type="button" class="pill" aria-pressed="false" style="border:none; cursor:pointer; font-family:inherit; font-size:inherit">Football</button>
+      <button type="button" class="pill" aria-pressed="false" style="border:none; cursor:pointer; font-family:inherit; font-size:inherit">Walks</button>
+    </div>
+    <div class="cards" id="news-cards" aria-live="polite">
       <a class="card" href="news-article.html?a=cricket-season-2026" style="padding:0; overflow:hidden; position:relative">
         <span class="cat cat-cricket on-media">Cricket</span>
         <img src="assets/team-photo.jpg" alt="Falcons team members in purple kit." style="width:100%; height:190px; object-fit:cover">
@@ -203,6 +212,36 @@
   </div>
 </footer>
 
+<script>
+/* News category filter (PO final amends 26.07: "filter by the different
+   events too?"). Static cards, so filtering is just show/hide — the pill
+   text doubles as the value matched against each card's .cat chip (M13). */
+(function () {
+  "use strict";
+  var wrap = document.getElementById("news-cards");
+  var pills = Array.prototype.slice.call(
+    document.querySelectorAll('[aria-label="Filter news by category"] button')
+  );
+  if (!wrap || !pills.length) return;
+  var cards = Array.prototype.slice.call(wrap.children);
+  pills.forEach(function (b) {
+    b.addEventListener("click", function () {
+      pills.forEach(function (x) {
+        var on = x === b;
+        x.setAttribute("aria-pressed", on ? "true" : "false");
+        x.style.background = on ? "var(--purple-600)" : "";
+        x.style.color = on ? "#fff" : "";
+      });
+      var want = b.textContent.trim();
+      cards.forEach(function (c) {
+        var cat = c.querySelector(".cat");
+        var show = want === "All news" || (cat && cat.textContent.trim() === want);
+        c.style.display = show ? "" : "none";
+      });
+    });
+  });
+})();
+</script>
 <script src="assets/app.js"></script>
 </body>
 </html>
