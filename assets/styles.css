@@ -14,6 +14,7 @@
 :root {
   --paper:        #FFFDF5;   /* cream — page background */
   --paper-2:      #F7F7F7;   /* light grey — alternate sections */
+  --card:         #FFFFFF;   /* text boxes — white on cream (PO V1 26.07: "yellow on yellow does not work") */
   --ink:          #2F2F2F;   /* charcoal — body text */
   --ink-soft:     #4A5568;   /* slate grey — muted text */
   --line:         #E5E2D8;   /* hairline on paper */
@@ -60,6 +61,7 @@
 html[data-contrast="high"] {
   --paper:    #000000;
   --paper-2:  #0B0B0B;
+  --card:     #000000;   /* keep cards black-on-black with the gold hairline */
   --ink:      #FFFFFF;
   --ink-soft: #EDE6D2;
   --line:     #4D4326;
@@ -254,7 +256,7 @@ h3.h3 { font-size: clamp(1.25rem, 1.8vw, 1.5rem); }
 /* ---------- Components ---------- */
 .cards { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); }
 .card {
-  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
   padding: 28px; box-shadow: var(--shadow); transition: transform var(--t), box-shadow var(--t);
   display: flex; flex-direction: column;
 }
@@ -441,7 +443,7 @@ legend { font-family: var(--font-head); font-weight: 700; padding: 0 10px; font-
 
 /* ---------- Sponsor logo slots (get-involved) ---------- */
 .sponsor-logos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-.sponsor-slot { display: grid; place-items: center; min-height: 96px; padding: 16px; border: 2px dashed var(--line); border-radius: var(--radius-sm); color: var(--ink-soft); font-family: var(--font-head); font-weight: 700; font-size: .9rem; text-align: center; background: var(--paper); }
+.sponsor-slot { display: grid; place-items: center; min-height: 96px; padding: 16px; border: 2px dashed var(--line); border-radius: var(--radius-sm); color: var(--ink-soft); font-family: var(--font-head); font-weight: 700; font-size: .9rem; text-align: center; background: var(--card); }
 [data-contrast="high"] .sponsor-slot { background: #000; border-color: #4D4326; color: var(--gold-300); }
 
 /* ---------- Two-tier header (brand + socials above, menu bar below) ---------- */
@@ -502,6 +504,52 @@ legend { font-family: var(--font-head); font-weight: 700; padding: 0 10px; font-
 }
 .a11y-fab:hover::after, .a11y-fab:focus-visible::after { opacity: 1; transform: translateY(-50%) scale(1); }
 [data-contrast="high"] .a11y-fab::after { background: #000; color: var(--gold-300); border: 1px solid #4D4326; }
+
+/* ---------- Category chips (PO V1 26.07: categories must stand out) ---------- */
+/* Solid colour-coded blocks with white text, per the client's example.
+   Every pair below is ≥ 4.5:1 against #fff (WCAG AA, small text). */
+.cat {
+  display: inline-block; font-family: var(--font-head); font-weight: 700;
+  font-size: .74rem; letter-spacing: .09em; text-transform: uppercase;
+  color: #fff; background: var(--purple-600); padding: 5px 12px; border-radius: 8px;
+}
+.cat.on-media { position: absolute; top: 14px; left: 14px; z-index: 1; box-shadow: 0 1px 6px rgba(0,0,0,.35); }
+.cat-cricket        { background: #5B2C83; }
+.cat-goalball       { background: #1D5FA8; }
+.cat-social         { background: #8A6212; }
+.cat-club           { background: #0E6F63; }
+.cat-football       { background: #166534; }
+.cat-walks          { background: #7C2D6E; }
+.cat-member-voices  { background: #B3266E; }
+.cat-living-the-game{ background: #1D5FA8; }
+.cat-guides         { background: #166534; }
+.cat-tips           { background: #8A6212; }
+[data-contrast="high"] .cat { background: #000; color: var(--gold-300); border: 1px solid var(--gold-400); }
+
+/* ---------- Tick bullets (PO V1 26.07: strong bullet — purple circle, white tick) ---------- */
+.tick {
+  width: 28px; height: 28px; flex: none; border-radius: 50%;
+  background: var(--purple-600); color: #fff; display: grid; place-items: center;
+}
+.tick svg { width: 15px; height: 15px; }
+[data-contrast="high"] .tick { background: var(--gold-400); color: #000; }
+
+/* ---------- Social icon optical balance (PO V1 26.07: f up slightly, X down slightly) ---------- */
+.header-socials a[aria-label*="Facebook"] svg { width: 20px; height: 20px; }
+.header-socials a[aria-label*="Twitter"]  svg { width: 16px; height: 16px; }
+.social-grid a[aria-label*="Facebook"] svg { width: 31px; height: 31px; }
+.social-grid a[aria-label*="Twitter"]  svg { width: 25px; height: 25px; }
+.socials a[aria-label*="Facebook"] svg { width: 29px; height: 29px; }
+.socials a[aria-label*="Twitter"]  svg { width: 23px; height: 23px; }
+
+/* ---------- Menu bar spread (PO V1 26.07) ---------- */
+/* Bigger labels, spread so the row ends roughly below the header's Facebook
+   icon (client mock). Desktop only — below 1041px this same .menu element
+   becomes the hamburger dropdown and must keep its column layout. */
+@media (min-width: 1041px) {
+  .menu-bar .menu { justify-content: space-between; max-width: 72%; }
+  .menu-bar .menu a { font-size: 1.08rem; }
+}
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1040px) {

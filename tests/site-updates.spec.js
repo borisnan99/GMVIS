@@ -1,7 +1,8 @@
 const { test, expect } = require("@playwright/test");
 
 const PUBLIC_PAGES = [
-  "/", "/about.html", "/activities.html", "/news.html", "/blog.html", "/gallery.html",
+  "/", "/about.html", "/activities.html", "/news.html", "/news-article.html",
+  "/blog.html", "/gallery.html",
   "/get-involved.html", "/contact.html", "/complaints.html",
   "/safeguarding.html", "/constitution.html", "/404.html",
 ];
@@ -237,5 +238,67 @@ test.describe("PO feedback V2 — About & Activities content", () => {
   test("activities 'Watch us on YouTube' button uses the gold style", async ({ page }) => {
     await page.goto("/activities.html");
     await expect(page.locator('main a[aria-label*="YouTube"]')).toHaveClass(/\bgold\b/);
+  });
+});
+
+/* ============================================================
+   Product-owner feedback V1 for News / Blog / Get Involved
+   (26.07.26 spreadsheet)
+   ============================================================ */
+test.describe("PO feedback — news, blog, get involved (July 2026)", () => {
+  test("news hero uses the approved intro line", async ({ page }) => {
+    await page.goto("/news.html");
+    await expect(page.locator("body")).toContainText(
+      "Match reports, club news and upcoming events — so you never miss a session, fixture or social."
+    );
+  });
+
+  test("news articles carry colour-coded category chips and link to the detail page", async ({ page }) => {
+    await page.goto("/news.html");
+    const chips = page.locator(".cards .cat");
+    await expect(chips).toHaveCount(6);
+    await expect(page.locator(".cat-cricket")).toBeVisible();
+    // every Read more goes to a real article page, not "#"
+    const links = page.locator('a.card[href^="news-article.html?a="]');
+    await expect(links).toHaveCount(6);
+  });
+
+  test("news detail page renders the requested article, and the latest without a slug", async ({ page }) => {
+    await page.goto("/news-article.html?a=goalball-cup-2026");
+    await expect(page.locator("h1")).toHaveText("Falcons place third at regional goalball cup");
+    await expect(page.locator("#art-body p").first()).toBeVisible();
+    await page.goto("/news-article.html");
+    await expect(page.locator("h1")).toHaveText("Summer cricket season kicks off at Sale");
+  });
+
+  test("text boxes are white on cream, not yellow-on-yellow", async ({ page }) => {
+    await page.goto("/news.html");
+    const bg = await page.locator(".event-row").first()
+      .evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(bg).toBe("rgb(255, 255, 255)");
+  });
+
+  test("get-involved uses solid purple buttons and strong tick bullets", async ({ page }) => {
+    await page.goto("/get-involved.html");
+    await expect(page.locator("main .btn.ghost")).toHaveCount(0);
+    await expect(page.locator(".tick")).toHaveCount(11);
+    const tickBg = await page.locator(".tick").first()
+      .evaluate((el) => getComputedStyle(el).backgroundColor);
+    expect(tickBg).toBe("rgb(91, 44, 131)"); // --purple-600
+  });
+
+  test("blog cards use the news-card design with a category chip", async ({ page, request }) => {
+    // Seed a published post through the API so the card renderer has data.
+    const title = `Chip check ${Date.now()}`;
+    const login = await request.post("/api/login", { data: { password: "test-admin-pass" } });
+    expect(login.ok()).toBeTruthy();
+    const created = await request.post("/api/posts", {
+      data: { title, category: "Tips", excerpt: "Chip render check.", body: "Body.", published: true },
+    });
+    expect(created.ok()).toBeTruthy();
+
+    await page.goto("/blog.html");
+    const card = page.locator(".card", { hasText: title });
+    await expect(card.locator(".cat.cat-tips")).toBeVisible();
   });
 });
