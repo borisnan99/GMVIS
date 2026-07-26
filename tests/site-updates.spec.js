@@ -287,6 +287,11 @@ test.describe("PO feedback — news, blog, get involved (July 2026)", () => {
     expect(tickBg).toBe("rgb(91, 44, 131)"); // --purple-600
   });
 
+  test("about banner drops the 'welcoming everyone with open arms' tail", async ({ page }) => {
+    await page.goto("/about.html");
+    await expect(page.locator("main .band .lede").first()).not.toContainText("welcoming everyone with open arms");
+  });
+
   test("blog cards use the news-card design with a category chip", async ({ page, request }) => {
     // Seed a published post through the API so the card renderer has data.
     const title = `Chip check ${Date.now()}`;
