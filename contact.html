@@ -118,6 +118,12 @@
         </select>
         <span class="err" id="c-topic-err" role="alert">Please choose an option.</span>
       </div>
+      <div class="field">
+        <label for="c-message">Your message <span class="req" aria-hidden="true">*</span></label>
+        <p class="hint" id="c-message-hint">Tell us how we can help. Include anything we should know to make your visit easier.</p>
+        <textarea class="textarea" id="c-message" name="c-message" required aria-required="true" aria-describedby="c-message-hint c-message-err"></textarea>
+        <span class="err" id="c-message-err" role="alert">This field is required.</span>
+      </div>
       <fieldset>
         <legend>Which activities are you interested in? <span style="font-family:var(--font-body); font-weight:400; color:var(--ink-soft); font-size:.95rem">(optional — tick any)</span></legend>
         <div class="radio-row">
@@ -149,12 +155,6 @@
           <label class="radio-chip"><input type="checkbox" name="c-support" value="A quiet introduction">A quiet introduction</label>
         </div>
       </fieldset>
-      <div class="field">
-        <label for="c-message">Your message <span class="req" aria-hidden="true">*</span></label>
-        <p class="hint" id="c-message-hint">Tell us how we can help. Include anything we should know to make your visit easier.</p>
-        <textarea class="textarea" id="c-message" name="c-message" required aria-required="true" aria-describedby="c-message-hint c-message-err"></textarea>
-        <span class="err" id="c-message-err" role="alert">This field is required.</span>
-      </div>
       <fieldset>
         <legend>Contact preference</legend>
         <div class="radio-row">
