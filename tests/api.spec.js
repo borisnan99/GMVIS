@@ -7,6 +7,17 @@ const PNG = Buffer.from(
   "base64"
 );
 
+test.describe("Static caching", () => {
+  // Assets must revalidate every request: a 30-day browser cache left the
+  // product owner reviewing week-stale styles (27.07.26). See index.js.
+  test("assets and HTML are served no-cache so changes reach returning visitors", async ({ request }) => {
+    const css = await request.get("/assets/styles.css");
+    expect(css.headers()["cache-control"]).toBe("no-cache");
+    const html = await request.get("/");
+    expect(html.headers()["cache-control"]).toBe("no-cache");
+  });
+});
+
 test.describe("API — health & auth", () => {
   test("health endpoint responds ok", async ({ request }) => {
     const r = await request.get("/api/health");
