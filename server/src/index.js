@@ -328,11 +328,18 @@ app.use("/api", function (req, res) { res.status(404).json({ error: "Not found."
 app.use(express.static(SITE_DIR, {
   extensions: ["html"],
   setHeaders: function (res, filePath) {
-    if (filePath.includes("/assets/") || filePath.includes("/uploads/")) {
-      // Long-lived caching for static assets, mirroring nginx's `expires 30d`
+    // Normalise Windows separators so the branch logic works in local dev too
+    filePath = filePath.split(path.sep).join("/");
+    if (filePath.includes("/uploads/")) {
+      // Long-lived caching for seeded media, mirroring nginx's `expires 30d`
       res.setHeader("Cache-Control", "public, max-age=2592000");
-    } else if (filePath.endsWith(".html")) {
-      // Revalidate HTML every request, mirroring nginx's `expires -1`
+    } else if (filePath.includes("/assets/") || filePath.endsWith(".html")) {
+      // CSS/JS/logo edits are frequent while the site is under active
+      // product-owner review, and the old 30-day cache left the client
+      // looking at week-stale styles (27.07.26). no-cache forces a
+      // revalidation each request; the ETag turns that into a cheap 304
+      // when nothing changed. Uploaded /media keeps its long cache above —
+      // those filenames are unique per upload.
       res.setHeader("Cache-Control", "no-cache");
     }
   },
