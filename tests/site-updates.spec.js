@@ -352,13 +352,21 @@ test.describe("PO final amends — get involved, news detail, contact", () => {
     expect(d).toBeLessThan(8);
   });
 
-  test("footer columns are equal widths", async ({ page }) => {
+  test("footer columns are evenly spaced across the content column", async ({ page }) => {
     await page.goto("/");
-    const tracks = await page.evaluate(() =>
-      getComputedStyle(document.querySelector(".footer-grid.cols-5")).gridTemplateColumns.split(" ").map(parseFloat)
-    );
-    expect(tracks).toHaveLength(5);
-    for (const t of tracks) expect(Math.abs(t - tracks[0])).toBeLessThan(1);
+    const m = await page.evaluate(() => {
+      const grid = document.querySelector(".footer-grid.cols-5");
+      const cols = [...grid.children].map((c) => c.getBoundingClientRect());
+      const g = grid.getBoundingClientRect();
+      const gaps = [];
+      for (let i = 1; i < cols.length; i++) gaps.push(cols[i].left - cols[i - 1].right);
+      return { gaps, left: cols[0].left - g.left, right: g.right - cols[cols.length - 1].right };
+    });
+    // even visible gaps between column contents…
+    for (const gap of m.gaps) expect(Math.abs(gap - m.gaps[0])).toBeLessThan(2);
+    // …flush to the content column edges (under "Home", ending at "Join in")
+    expect(m.left).toBeLessThan(2);
+    expect(m.right).toBeLessThan(2);
   });
 
   test("contact form asks for the message straight after the enquiry topic", async ({ page }) => {
