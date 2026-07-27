@@ -344,8 +344,11 @@ legend { font-family: var(--font-head); font-weight: 700; padding: 0 10px; font-
 [data-contrast="high"] .site-footer { background:#000; border-top: 1px solid #4D4326; }
 .footer-grid { display: grid; gap: 40px; grid-template-columns: 1.4fr repeat(3, 1fr); }
 /* Home carries a fifth (Useful links) column; other pages follow after sign-off */
-/* Equal column widths per PO email 27.07 ("all slightly different") */
-.footer-grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
+/* PO 28.07: equal *visible* gaps between column contents (equal 1fr tracks
+   still looked uneven because content widths differ). Content-sized tracks +
+   space-between = even gaps, first column flush under "Home", last ending at
+   the content edge in line with the "Join in" button. */
+.footer-grid.cols-5 { grid-template-columns: repeat(5, max-content); justify-content: space-between; }
 /* The brand lockup was sized for the old wider first column — let it wrap
    inside the equal track instead of overflowing. */
 .site-footer .brand { align-items: flex-start; }
