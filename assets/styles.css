@@ -344,7 +344,13 @@ legend { font-family: var(--font-head); font-weight: 700; padding: 0 10px; font-
 [data-contrast="high"] .site-footer { background:#000; border-top: 1px solid #4D4326; }
 .footer-grid { display: grid; gap: 40px; grid-template-columns: 1.4fr repeat(3, 1fr); }
 /* Home carries a fifth (Useful links) column; other pages follow after sign-off */
-.footer-grid.cols-5 { grid-template-columns: 1.3fr repeat(4, 1fr); }
+/* Equal column widths per PO email 27.07 ("all slightly different") */
+.footer-grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
+/* The brand lockup was sized for the old wider first column — let it wrap
+   inside the equal track instead of overflowing. */
+.site-footer .brand { align-items: flex-start; }
+.site-footer .brand .name b,
+.site-footer .brand .name span { white-space: normal; }
 .site-footer h4 { color: #fff; font-size: 1rem; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 16px; }
 .site-footer a { color: #E6DAF7; text-decoration: none; }
 .site-footer a:hover { color: var(--gold-300); text-decoration: underline; }
