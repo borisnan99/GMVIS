@@ -340,6 +340,27 @@ test.describe("PO final amends — get involved, news detail, contact", () => {
     await expect(page.locator('#art-related a[href*="spring-walks-2026"]')).toHaveCount(0);
   });
 
+  test("home stats strip is centred as a group", async ({ page }) => {
+    await page.goto("/");
+    const d = await page.evaluate(() => {
+      const dl = document.querySelector('section[aria-label="At a glance"] dl');
+      const kids = [...dl.children].map((c) => c.getBoundingClientRect());
+      const r = dl.getBoundingClientRect();
+      const unionCentre = (Math.min(...kids.map((k) => k.left)) + Math.max(...kids.map((k) => k.right))) / 2;
+      return Math.abs(unionCentre - (r.left + r.width / 2));
+    });
+    expect(d).toBeLessThan(8);
+  });
+
+  test("footer columns are equal widths", async ({ page }) => {
+    await page.goto("/");
+    const tracks = await page.evaluate(() =>
+      getComputedStyle(document.querySelector(".footer-grid.cols-5")).gridTemplateColumns.split(" ").map(parseFloat)
+    );
+    expect(tracks).toHaveLength(5);
+    for (const t of tracks) expect(Math.abs(t - tracks[0])).toBeLessThan(1);
+  });
+
   test("contact form asks for the message straight after the enquiry topic", async ({ page }) => {
     await page.goto("/contact.html");
     const order = await page.evaluate(() => {
