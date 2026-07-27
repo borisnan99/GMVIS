@@ -14,6 +14,10 @@ const PAGES = [
   { name: "Complaints",  path: "/complaints.html" },
   { name: "Safeguarding",path: "/safeguarding.html" },
   { name: "Constitution",path: "/constitution.html" },
+  { name: "Privacy",     path: "/privacy.html" },
+  { name: "Cookies",     path: "/cookies.html" },
+  { name: "Terms",       path: "/terms.html" },
+  { name: "Site map",    path: "/sitemap.html" },
 ];
 
 for (const { name, path } of PAGES) {

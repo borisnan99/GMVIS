@@ -91,7 +91,7 @@ test.describe("Policy pages", () => {
   test("footer policy links exist and resolve", async ({ page }) => {
     await page.goto("/");
     const links = page.locator(".footer-policies a");
-    await expect(links).toHaveCount(2);
+    await expect(links).toHaveCount(6); // + privacy, cookies, terms, site map (July 2026)
     for (const link of await links.all()) {
       const href = await link.getAttribute("href");
       const res = await page.request.get(href);
