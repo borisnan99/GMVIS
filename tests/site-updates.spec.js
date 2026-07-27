@@ -340,6 +340,16 @@ test.describe("PO final amends — get involved, news detail, contact", () => {
     await expect(page.locator('#art-related a[href*="spring-walks-2026"]')).toHaveCount(0);
   });
 
+  test("contact form asks for the message straight after the enquiry topic", async ({ page }) => {
+    await page.goto("/contact.html");
+    const order = await page.evaluate(() => {
+      const ids = Array.from(document.querySelectorAll("#c-topic, #c-message, input[name='c-sports']"));
+      return ids.map((el) => el.id || el.name);
+    });
+    expect(order[0]).toBe("c-topic");
+    expect(order[1]).toBe("c-message");
+  });
+
   test("contact page reads 'Get in touch' with the simplified form", async ({ page }) => {
     await page.goto("/contact.html");
     await expect(page.locator("main")).toContainText("Get in touch");
