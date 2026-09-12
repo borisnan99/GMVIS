@@ -35,6 +35,8 @@
 
 /* Editor forms */
 .admin-editor { margin-bottom: 28px; }
+/* The shared .card display rule must not expose a closed editor. */
+.admin-editor[hidden] { display: none; }
 .admin-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
 @media (max-width: 640px) { .admin-grid-2 { grid-template-columns: 1fr; } }
 .admin-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 6px; }

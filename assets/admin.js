@@ -291,7 +291,13 @@
     e.preventDefault();
     var fileInput = $("#upload-file");
     fileInput.setAttribute("aria-invalid", "false");
+    $("#upload-file-err").textContent = "Please choose a file.";
     if (!fileInput.files || !fileInput.files.length) {
+      fileInput.setAttribute("aria-invalid", "true"); fileInput.focus(); return;
+    }
+    // Reserve multipart overhead within the 100 MB request allowance.
+    if (fileInput.files[0].size >= 99 * 1000 * 1000) {
+      $("#upload-file-err").textContent = "File is too large (max 99 MB).";
       fileInput.setAttribute("aria-invalid", "true"); fileInput.focus(); return;
     }
     var fd = new FormData();

@@ -10,7 +10,6 @@ module.exports = defineConfig({
   expect: { timeout: 8_000 },
   fullyParallel: true,
   reporter: [["list"], ["html", { open: "never" }]],
-  globalSetup: "./tests/global-setup.js",
   metadata: { adminPassword: ADMIN_PASSWORD },
   use: {
     baseURL: "http://localhost:3100",
@@ -20,7 +19,9 @@ module.exports = defineConfig({
   },
   webServer: {
     // Dedicated test port (3100) to avoid colliding with a dev server on 3000.
-    command: "node server/src/index.js",
+    // Playwright starts webServer before globalSetup. Clean the test data in
+    // the server launcher so an open SQLite database/uploads dir is not deleted.
+    command: "node tests/start-server.js",
     url: "http://localhost:3100/api/health",
     reuseExistingServer: false,
     timeout: 30_000,
