@@ -33,10 +33,9 @@ ingress:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     cloudflare.com/dns-enabled: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    # Multer caps uploads at exactly 200 MiB (server/src/index.js). 210m gives
-    # the multipart envelope headroom so the app's friendly JSON 400 is always
-    # what enforces the limit, never nginx's HTML 413.
-    nginx.ingress.kubernetes.io/proxy-body-size: "210m"
+    # The 99 MB file limit leaves multipart headroom inside a 100 MB request.
+    # Use decimal bytes here, matching the app and browser validation.
+    nginx.ingress.kubernetes.io/proxy-body-size: "100000000"
     # Large video range-requests can stream for a long time; don't let the
     # 60s proxy defaults kill them, and don't spool responses to the
     # controller's disk. Request buffering stays ON (default) on purpose:

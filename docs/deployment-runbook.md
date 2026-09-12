@@ -16,7 +16,7 @@ cluster to a running `https://gmvis.org`. After this, the CI/CD pipeline
 On your machine: `kubeseal`, `kubectl`, `openssl`, `helm`.
 
 On the cluster (all already present on the talos cluster):
-`ingress-nginx`, `cert-manager` with ClusterIssuer `letsencrypt-prod`,
+`ingress-nginx`, `cert-manager` with ClusterIssuer `letsencrypt-dns01-prod`,
 `sealed-secrets` controller, `nfs-client` StorageClass, ArgoCD at a public
 HTTPS endpoint, and the Cloudflare integration that honours the
 `cloudflare.com/dns-enabled` Ingress annotation.
@@ -27,11 +27,13 @@ HTTPS endpoint, and the Cloudflare integration that honours the
 >    A/CNAME record for `gmvis.org` → the cluster ingress IP manually after
 >    the first deploy, and remove the `cloudflare.com/dns-enabled` annotation
 >    from `deploy/helm/gmvis/values.yaml`.
-> 2. The record must be **DNS-only (grey cloud), not proxied**. Proxied
->    records hit Cloudflare's request-body cap (100 MB on Free/Pro), which
->    hard-rejects the admin portal's 200 MB video uploads with a Cloudflare
->    413 no ingress annotation can fix, and its ~100 s origin timeout can
->    kill long video streams.
+> 2. Production opts into the apex ExternalDNS controller and Cloudflare
+>    proxying in `values-prod.yaml`. Issue the DNS-01 certificate and enable
+>    hostname-scoped Full (strict) TLS before activation. Adopt an existing A
+>    record with the controller's ownership TXT without replacing its target.
+>    Uploads are limited to 99 MB per file, leaving multipart overhead within
+>    the 100 MB request cap. Roll back using the ingress proxy annotation;
+>    keep DNS ownership and DNS-01 renewal enabled.
 
 > **Storage caveats (nfs-client):**
 > - `fsGroup: 1000` in the pod spec does not chown NFS volumes; writability
@@ -186,7 +188,7 @@ curl -fsS https://gmvis.org/api/health        # {"ok":true}
 
 Then in a browser: load `https://gmvis.org/`, log in at `/admin.html` with
 the admin password, create a test post, upload a test image, **and upload one
-large test video (~150–200 MB)** — the video is the only test that exercises
+large test video (below 99 MB)** — the video is the only test that exercises
 the ingress body-size limit, the streaming timeouts, and the Cloudflare path
 together. Confirm both appear on `/blog.html` and `/gallery.html` and the
 video seeks (range requests). Finally verify persistence:
@@ -215,9 +217,10 @@ Delete the test post/media via `/admin.html` when done.
   see the storage caveat in §0.
 - **Cert never issues:** check `kubectl -n prod-gmvis describe certificate
   gmvis-web-tls`; usually DNS hasn't propagated (see §0 DNS caveats).
-- **Uploads fail with an HTML 413 or Cloudflare error page:** the DNS record
-  is proxied (orange cloud) — switch it to DNS-only (§0), or the file exceeds
-  multer's 200 MB limit (expected, the app returns a JSON error for that).
+- **Uploads fail with an HTML 413 or Cloudflare error page:** the request
+  exceeds the 100 MB edge/ingress cap. Files must be below 99 MB; the browser
+  rejects them before upload and the server independently returns a JSON
+  error. Keep proxying enabled and reduce the file size.
 - **App shows OutOfSync on the PVC only:** someone removed the PVC from the
   chart — it is annotated `Prune=false,Delete=false` precisely so ArgoCD
   retains it; that OutOfSync is the alarm working. Restore the template or

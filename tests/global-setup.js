@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 /* Start each test run from a clean database/uploads dir so results are
-   deterministic. Runs before the webServer launches. */
+   deterministic. Called by start-server.js before opening the database. */
 module.exports = async function globalSetup() {
   const dir = path.join(__dirname, "..", ".pwtest-data");
   // Best-effort: a stale OS lock shouldn't abort the run. Tests assert on data

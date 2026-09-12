@@ -88,6 +88,28 @@ test.describe("API — post lifecycle", () => {
 });
 
 test.describe("API — assets & media", () => {
+  test("accepts a file below 99 MB and rejects the limit with a JSON error", async ({ request }) => {
+    test.setTimeout(60_000);
+    await request.post("/api/login", { data: { password: PASSWORD } });
+    const belowLimit = Buffer.alloc(99_000_000 - 1);
+    PNG.copy(belowLimit);
+    const accepted = await request.post("/api/assets", {
+      multipart: { file: { name: "upload-limit.png", mimeType: "image/png", buffer: belowLimit } },
+    });
+    expect(accepted.status(), await accepted.text()).toBe(201);
+    const asset = await accepted.json();
+    expect(asset.size).toBe(99_000_000 - 1);
+    try {
+      const rejected = await request.post("/api/assets", {
+        multipart: { file: { name: "too-large.png", mimeType: "image/png", buffer: Buffer.alloc(99_000_000) } },
+      });
+      expect(rejected.status()).toBe(400);
+      expect(await rejected.json()).toEqual({ error: "File is too large (max 99 MB)." });
+    } finally {
+      expect((await request.delete("/api/assets/" + asset.id)).ok()).toBeTruthy();
+    }
+  });
+
   test("upload image, range request, delete removes media", async ({ request }) => {
     await request.post("/api/login", { data: { password: PASSWORD } });
 

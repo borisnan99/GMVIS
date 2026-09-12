@@ -23,7 +23,8 @@ const EXT_BY_MIME = {
   "image/avif": "avif", "image/svg+xml": "svg",
   "video/mp4": "mp4", "video/webm": "webm", "video/ogg": "ogv", "video/quicktime": "mov",
 };
-const MAX_UPLOAD_BYTES = 200 * 1024 * 1024; // 200 MB (videos)
+// Leave room for multipart fields inside the edge's 100 MB request limit.
+const MAX_UPLOAD_BYTES = 99 * 1000 * 1000;
 
 function kindForMime(mime) {
   if (IMAGE_MIMES.includes(mime)) return "image";
@@ -256,7 +257,7 @@ function uploadSingle(req, res, next) {
       // Clean up partial file if any
       if (req.file && req.file.path) { try { fs.unlinkSync(req.file.path); } catch (e) {} }
       const msg = err.code === "LIMIT_FILE_SIZE"
-        ? "File is too large (max 200 MB)."
+        ? "File is too large (max 99 MB)."
         : err.message || "Upload failed.";
       return res.status(400).json({ error: msg });
     }
