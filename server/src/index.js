@@ -318,8 +318,12 @@ app.delete("/api/assets/:id", auth.requireAuth, function (req, res) {
 /* ---- Media (uploaded files); express.static supports Range requests for video ---- */
 app.use("/media", express.static(UPLOAD_DIR, {
   index: false,
-  maxAge: "30d",
-  setHeaders: function (res) { res.setHeader("X-Content-Type-Options", "nosniff"); },
+  setHeaders: function (res) {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    // Uploaded files can be deleted. Revalidate cached copies before reuse so
+    // browsers and the CDN observe deletion while unchanged files can use 304.
+    res.setHeader("Cache-Control", "no-cache");
+  },
 }));
 
 /* ---- API 404 (so unknown /api paths don't fall through to static) ---- */
@@ -339,8 +343,8 @@ app.use(express.static(SITE_DIR, {
       // product-owner review, and the old 30-day cache left the client
       // looking at week-stale styles (27.07.26). no-cache forces a
       // revalidation each request; the ETag turns that into a cheap 304
-      // when nothing changed. Uploaded /media keeps its long cache above —
-      // those filenames are unique per upload.
+      // when nothing changed. Uploaded /media also revalidates above so a
+      // deleted file is no longer served from a fresh cached copy.
       res.setHeader("Cache-Control", "no-cache");
     }
   },

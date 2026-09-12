@@ -129,10 +129,14 @@ test.describe("API — assets & media", () => {
     const media = await request.get(asset.url);
     expect(media.status()).toBe(200);
     expect(media.headers()["content-type"]).toContain("image/png");
+    expect(media.headers()["cache-control"]).toBe("no-cache");
+    const unchanged = await request.get(asset.url, { headers: { "If-None-Match": media.headers().etag } });
+    expect(unchanged.status()).toBe(304);
 
     // Range request -> 206 Partial Content
     const ranged = await request.get(asset.url, { headers: { Range: "bytes=0-9" } });
     expect(ranged.status()).toBe(206);
+    expect(ranged.headers()["cache-control"]).toBe("no-cache");
 
     // Delete -> media gone
     const del = await request.delete("/api/assets/" + asset.id);
