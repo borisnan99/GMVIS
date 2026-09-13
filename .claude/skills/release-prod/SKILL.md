@@ -86,9 +86,10 @@ curl -fsS https://gmvis.org/api/health     # {"ok":true}
 
 Then browse `https://gmvis.org/`: spot-check whatever this release changed,
 log into `/admin.html` if the release touched admin/API, and if the
-upload/ingress path changed, upload a large video (~150–200 MB) — that is
+upload/ingress path changed, upload a large video (below 99 MB) — that is
 the only check that exercises the ingress body limit, streaming timeouts,
-and the Cloudflare DNS-only requirement together.
+and the Cloudflare-proxied path together. Also verify an oversized file is rejected
+before upload; the 99 MB file cap leaves room within the 100 MB request cap.
 
 ## 5. Rollback
 

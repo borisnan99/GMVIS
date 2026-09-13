@@ -69,6 +69,7 @@ test.describe("Admin — blog posts", () => {
   test("create a post, see it in the list and on the public blog", async ({ page }) => {
     const title = "Admin created post " + Date.now();
     await login(page);
+    await expect(page.locator("#post-form")).toBeHidden();
     await page.click("#new-post-btn");
     await expect(page.locator("#post-form")).toBeVisible();
     await page.fill("#post-title", title);
@@ -79,6 +80,7 @@ test.describe("Admin — blog posts", () => {
     await page.click("#post-save");
 
     await expect(page.locator("#posts-list")).toContainText(title);
+    await expect(page.locator("#post-form")).toBeHidden();
 
     // Public blog shows it
     await page.goto("/blog.html");
@@ -125,6 +127,26 @@ test.describe("Admin — blog posts", () => {
 });
 
 test.describe("Admin — media", () => {
+  test("rejects oversized files before sending an upload and focuses the error", async ({ page }) => {
+    await login(page);
+    await page.click("#tab-media");
+    await expect(page.locator("#upload-file-hint")).toContainText("Max 99");
+    await page.setInputFiles("#upload-file", IMG);
+    // Exercise File.size validation without transferring a huge file through CDP.
+    await page.locator("#upload-file").evaluate(function (input) {
+      Object.defineProperty(input.files[0], "size", { value: 99_000_000 });
+    });
+    const uploads = [];
+    page.on("request", function (request) {
+      if (request.method() === "POST" && request.url().endsWith("/api/assets")) uploads.push(request.url());
+    });
+    await page.click("#upload-submit");
+    await expect(page.locator("#upload-file")).toHaveAttribute("aria-invalid", "true");
+    await expect(page.locator("#upload-file")).toBeFocused();
+    await expect(page.locator("#upload-file-err")).toHaveText("File is too large (max 99 MB).");
+    expect(uploads).toEqual([]);
+  });
+
   test("upload an image, see it in the grid and on the gallery", async ({ page }) => {
     const caption = "Uploaded caption " + Date.now();
     await login(page);

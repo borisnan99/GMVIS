@@ -38,7 +38,7 @@ The project has two parts:
 | Fonts | Outfit (headings), Atkinson Hyperlegible (body), Lexend (dyslexia toggle) | Atkinson is designed for low vision |
 | Backend | Node.js 24 + Express 4 | CommonJS |
 | Database | **`node:sqlite`** (Node's built-in SQLite) | No native deps; experimental flag, warning suppressed |
-| File uploads | `multer` | Disk storage, 200 MB limit |
+| File uploads | `multer` | Disk storage, 99 MB limit |
 | Auth | Shared password → HMAC-signed httpOnly cookie | `node:crypto`, no JWT lib |
 | Forms (contact/complaints/newsletter) | **Web3Forms** | Access key is public/client-side (safe to embed) |
 | Tests | **Playwright + `@axe-core/playwright`** | 119 tests |
@@ -173,7 +173,7 @@ single `node server/src/index.js` serves everything on one port.
 | `GET /media/:file` | – | serve uploaded file (supports `Range` → 206) |
 
 Allowed uploads: images (jpg, png, webp, gif, avif, svg) and video (mp4, webm,
-ogg, mov), up to **200 MB**.
+ogg, mov), up to **99 MB**.
 
 ### Public display
 - `blog.html` (`#blog-posts`) and `gallery.html` (`#gallery-grid`) fetch from the

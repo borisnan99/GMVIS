@@ -48,7 +48,7 @@ drift — trust code and tests over it, and update it when structure changes).
 | Shared behavior (a11y toolbar, nav, read-aloud, Web3Forms submit) | `assets/app.js` |
 | Public dynamic blog/gallery rendering | `assets/content.js` |
 | API routes/uploads · schema · auth | `server/src/index.js` · `db.js` · `auth.js` |
-| Tests (8 specs + global-setup) | `tests/` |
+| Tests (8 specs + setup/server launcher) | `tests/` |
 | Image · chart · CI · ops runbook | `server/Dockerfile` · `deploy/helm/gmvis/` · `.github/workflows/deploy.yml` · `docs/deployment-runbook.md` |
 | Design specs & implementation plans | `docs/superpowers/{specs,plans}/` |
 | **DEAD legacy files — never edit** | root `script.js`, root `styles.css` |

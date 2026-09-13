@@ -33,7 +33,8 @@ npm run test:report                       # open HTML report after a run
 Facts you need to interpret results correctly:
 
 - Playwright **auto-starts the server** on port **3100** with a fresh
-  `.pwtest-data/` dir (`playwright.config.js` + `tests/global-setup.js`).
+  `.pwtest-data/` dir (`playwright.config.js` launches `tests/start-server.js`,
+  which runs `tests/global-setup.js` before the server opens its database).
   Don't start a server yourself for tests; don't run two test runs at once
   (`reuseExistingServer: false` will fail the second).
 - Tests run **fully parallel against one shared DB**. Specs assert on data
