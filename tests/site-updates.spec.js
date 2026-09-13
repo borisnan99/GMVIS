@@ -352,6 +352,26 @@ test.describe("PO final amends — get involved, news detail, contact", () => {
     expect(d).toBeLessThan(8);
   });
 
+  // PO 13.09.26: on phones the four figures form a 2×2 grid ("quadrant"),
+  // never an uneven 3+1 wrap; desktop keeps the single spread-out row.
+  test("home stats strip is a 2×2 grid on phones and one row on desktop", async ({ page }) => {
+    const rowCounts = () => page.evaluate(() => {
+      const kids = [...document.querySelectorAll('section[aria-label="At a glance"] dl > div')];
+      const top = (k) => Math.round(k.getBoundingClientRect().top);
+      const tops = [...new Set(kids.map(top))].sort((a, b) => a - b);
+      return tops.map((t) => kids.filter((k) => top(k) === t).length);
+    });
+    await page.goto("/");
+    for (const width of [360, 390, 430, 600, 740, 820]) {
+      await page.setViewportSize({ width, height: 900 });
+      expect(await rowCounts(), `at ${width}px`).toEqual([2, 2]);
+    }
+    for (const width of [860, 1024, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      expect(await rowCounts(), `at ${width}px`).toEqual([4]);
+    }
+  });
+
   test("footer columns are evenly spaced across the content column", async ({ page }) => {
     await page.goto("/");
     const m = await page.evaluate(() => {
