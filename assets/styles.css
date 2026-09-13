@@ -562,6 +562,24 @@ legend { font-family: var(--font-head); font-weight: 700; padding: 0 10px; font-
   .menu-bar .menu a { font-size: 1.08rem; }
 }
 
+/* ---------- Stats strip (home "At a glance") ---------- */
+/* PO 13.09.26: on phones the four figures must sit as a 2×2 grid, not wrap
+   unevenly (3+1). Desktop keeps the spread-out single row. The row needs
+   ~726px of content width at the default text size, i.e. an ~807px viewport
+   once --pad is taken off, so the grid applies up to 840px; anything lower
+   reintroduces the 3+1 wrap on small tablets (tests/site-updates.spec.js). */
+.stats-strip {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 24px;
+  padding-block: 20px; margin-block: 0; text-align: center;
+}
+.stats-strip dd {
+  font-family: var(--font-head); font-weight: 800; font-size: 2.6rem;
+  color: var(--purple-600); margin: 0;
+}
+@media (max-width: 840px) {
+  .stats-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 12px; }
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1040px) {
   .hamburger { display: inline-flex; }
