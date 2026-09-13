@@ -372,6 +372,75 @@ test.describe("PO final amends — get involved, news detail, contact", () => {
     }
   });
 
+  /* ---------------------------------------------------------------
+     PO photos and videos (Nasim, 13.09.26): real photos replace the
+     placeholders on home/about, and cricket + goalball each get a video on
+     the activities page. Videos must stay captioned and described — the
+     audience is blind and partially sighted, and axe's video-caption rule
+     fails a <video> without a captions track.
+     --------------------------------------------------------------- */
+  test("home 'Who we are' shows the goalball team photo with real alt text", async ({ page }) => {
+    await page.goto("/");
+    const img = page.locator('section[aria-labelledby="who-h"] img');
+    await expect(img).toHaveAttribute("src", /home-goalball-team\.jpg$/);
+    expect((await img.getAttribute("alt")).length).toBeGreaterThan(30);
+  });
+
+  test("home activity cards: cricket and goalball have photos, the other four keep the placeholder", async ({ page }) => {
+    await page.goto("/");
+    const cards = page.locator("#act-cards .card");
+    await expect(cards).toHaveCount(6);
+    await expect(cards.nth(0).locator("img")).toHaveAttribute("src", /home-sport-cricket\.jpg$/);
+    await expect(cards.nth(1).locator("img")).toHaveAttribute("src", /home-sport-goalball\.jpg$/);
+    await expect(page.locator("#act-cards .card-media.ph")).toHaveCount(4);
+  });
+
+  test("about 'Meet the teams' shows the cricket and goalball photos", async ({ page }) => {
+    await page.goto("/about.html");
+    const cards = page.locator("main .cards article.card");
+    await expect(cards).toHaveCount(3);
+    await expect(cards.nth(0).locator("img")).toHaveAttribute("src", /about-falcons-t20-final\.jpg$/);
+    await expect(cards.nth(0).locator("img")).toHaveAttribute("alt", /Yasmin Qureshi/);
+    await expect(cards.nth(1).locator("img")).toHaveAttribute("src", /about-goalball-team\.jpg$/);
+    await expect(cards.nth(2).locator(".ph")).toHaveCount(1);
+  });
+
+  test("activities has a captioned and described video for cricket and for goalball", async ({ page }) => {
+    await page.goto("/activities.html");
+    const expected = [
+      { article: "#cricket", file: "falcons-t20-final-2026", poster: "activities-cricket-video.jpg" },
+      { article: "#goalball", file: "goalball-2026", poster: "activities-goalball-video.jpg" },
+    ];
+    for (const e of expected) {
+      const fig = page.locator(`${e.article} figure.video-figure`);
+      const video = fig.locator("video");
+      await expect(video).toHaveCount(1);
+      await expect(video).toHaveAttribute("controls", "");
+      await expect(video).toHaveAttribute("preload", "none");
+      await expect(video).toHaveAttribute("poster", new RegExp(e.poster + "$"));
+      expect((await video.getAttribute("aria-label")).length).toBeGreaterThan(20);
+      await expect(video.locator("source")).toHaveAttribute("src", new RegExp(`assets/video/${e.file}\\.mp4$`));
+      await expect(video.locator('track[kind="captions"]')).toHaveCount(1);
+      await expect(video.locator('track[kind="descriptions"]')).toHaveCount(1);
+      await expect(fig.locator("figcaption")).toBeVisible();
+      await expect(fig.locator("figcaption .video-desc")).not.toBeEmpty();
+    }
+    await expect(page.locator("main video")).toHaveCount(2);
+  });
+
+  test("video files and WebVTT tracks are served", async ({ request }) => {
+    for (const f of ["falcons-t20-final-2026", "goalball-2026"]) {
+      for (const kind of ["captions", "descriptions"]) {
+        const r = await request.get(`/assets/video/${f}.${kind}.vtt`);
+        expect(r.status(), `${f}.${kind}.vtt`).toBe(200);
+        expect((await r.text()).startsWith("WEBVTT")).toBe(true);
+      }
+      const head = await request.head(`/assets/video/${f}.mp4`);
+      expect(head.status(), `${f}.mp4`).toBe(200);
+      expect(head.headers()["content-type"]).toMatch(/^video\/mp4/);
+    }
+  });
+
   test("footer columns are evenly spaced across the content column", async ({ page }) => {
     await page.goto("/");
     const m = await page.evaluate(() => {

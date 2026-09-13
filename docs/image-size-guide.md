@@ -34,7 +34,9 @@ re-measure if card/hero layouts change.
 
 | Slot | Count | Recommended | Minimum | Shape |
 |---|---|---|---|---|
-| Per-sport photo | 6 | 1200 × 800 | 620 × 400 | 3:2 landscape |
+| Per-sport photo (football, baseball, walks, socials) | 4 | 1200 × 800 | 620 × 400 | 3:2 landscape |
+| Video cover (cricket, goalball) — shown as the video's poster, play mark added by the media pipeline | 2 | 1280 × 720 | 960 × 540 | 16:9 landscape |
+| Video (cricket, goalball) | 2 | MP4 (H.264 + AAC), ≤ 20 MB each | | 16:9 landscape |
 
 ## News list
 

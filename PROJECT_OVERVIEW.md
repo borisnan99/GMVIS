@@ -71,7 +71,8 @@ The project has two parts:
 │   ├── admin.js               Admin portal logic (login + posts/media CRUD)
 │   ├── admin.css              Admin portal styles
 │   ├── falcon-bird.svg, falcon-lockup.svg, falcon.svg   logos
-│   └── team-photo.jpg, team-photo-lg.jpg
+│   ├── team-photo.jpg, team-photo-lg.jpg, home-*.jpg, about-*.jpg, activities-*.jpg   page photos (sizes: docs/image-size-guide.md)
+│   └── video/                 Activities-page videos (MP4) with .captions.vtt + .descriptions.vtt beside each
 │
 ├── uploads/                   Pre-existing static team photos (NOT the admin uploads)
 │
