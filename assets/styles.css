@@ -580,6 +580,21 @@ legend { font-family: var(--font-head); font-weight: 700; padding: 0 10px; font-
   .stats-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 12px; }
 }
 
+/* ---------- Activity videos ---------- */
+/* PO 13.09.26: cricket and goalball each get a video on the activities page,
+   with a cover shot carrying a play mark as the poster. The box is the video's
+   own 16:9 so poster and playing frame line up; preload=none keeps the
+   10–18 MB files off the wire until someone presses play. Native controls are
+   keyboard-operable; captions + descriptions tracks live next to the MP4s. */
+.video-figure { margin: 0; }
+.video-figure video {
+  display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover;
+  background: #000; border-radius: var(--radius); box-shadow: var(--shadow-lg);
+}
+.video-figure figcaption { margin-top: 12px; font-size: .95rem; color: var(--ink-soft); }
+.video-figure .video-desc { display: block; margin-top: 6px; }
+[data-contrast="high"] .video-figure video { border: 2px solid #fff; box-shadow: none; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1040px) {
   .hamburger { display: inline-flex; }
